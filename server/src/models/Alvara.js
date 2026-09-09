@@ -1,5 +1,17 @@
 import mongoose from 'mongoose';
 
+const enderecoSchema = {
+  naturezaServico: { type: String, enum: ['5', '9', '290', 'Z'], default: '5' },
+  localObra: { type: String, trim: true, default: '' },
+  transversal1: { type: String, trim: true, default: '' },
+  transversal2: { type: String, trim: true, default: '' },
+  qtdExtensao: { type: Number, default: 0 },
+  larguraM: { type: Number, default: 0 },
+  pavimento: { type: String, trim: true, default: '' },
+  areaM2: { type: Number, default: 0 },
+  folhaNumero: { type: String, trim: true, default: '' },
+};
+
 const alvaraSchema = new mongoose.Schema(
   {
     incluidoPor: { type: String, required: true, trim: true },
@@ -16,7 +28,6 @@ const alvaraSchema = new mongoose.Schema(
       enum: ['A_FAZER', 'ENVIADO', 'RECEBIDO'],
       default: 'A_FAZER',
     },
-    prioridade: { type: Boolean, default: false },
     dataMarcada: { type: Date, default: Date.now },
     responsavel: { type: String, trim: true, default: '' },
     ruaPrincipal: { type: String, trim: true, default: '' },
@@ -24,6 +35,7 @@ const alvaraSchema = new mongoose.Schema(
     transversal2: { type: String, trim: true, default: '' },
     qtdPostes: { type: Number, default: 0 },
     qtdCaboM: { type: Number, default: 0 },
+    enderecos: { type: [enderecoSchema], default: [] },
   },
   { timestamps: true }
 );

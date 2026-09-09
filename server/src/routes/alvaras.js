@@ -47,10 +47,10 @@ const CAMPOS_EDITAVEIS = [
   'ruaPrincipal',
   'transversal1',
   'transversal2',
-  'prioridade',
   'dataMarcada',
   'qtdPostes',
   'qtdCaboM',
+  'enderecos',
 ];
 
 router.patch('/:id', async (req, res) => {

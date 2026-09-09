@@ -1,7 +1,6 @@
 import { corFixaDoTipo } from './constants.js';
 
 export function corDoAlvara(alvara) {
-  if (alvara.prioridade && alvara.situacao !== 'RECEBIDO') return 'vermelho';
   if (alvara.situacao === 'ENVIADO' || alvara.situacao === 'RECEBIDO') return 'verde';
   return null;
 }

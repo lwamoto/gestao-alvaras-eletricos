@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:4000/api/alvaras';
+const API_URL = '/api/alvaras';
 
 export async function listAlvaras(filtros = {}) {
   const params = new URLSearchParams();
