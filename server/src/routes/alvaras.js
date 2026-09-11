@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import Alvara from '../models/Alvara.js';
+import HistoricoAlvara from '../models/HistoricoAlvara.js';
 
 const router = Router();
 
@@ -33,17 +34,35 @@ router.get('/projeto/:numeroProjeto', async (req, res) => {
   res.json(alvara);
 });
 
+router.get('/:id/historico', async (req, res) => {
+  const eventos = await HistoricoAlvara.find({ alvaraId: req.params.id }).sort({ createdAt: -1 });
+  res.json(eventos);
+});
+
 router.post('/', async (req, res) => {
   try {
-    const { incluidoPor, numeroProjeto, tipo, empreiteira, situacao, responsavel } = req.body;
+    const { numeroProjeto, tipo, empreiteira, situacao, responsavel } = req.body;
     const alvara = await Alvara.create({
-      incluidoPor,
+      incluidoPor: req.usuario.nome,
       numeroProjeto,
       tipo,
       empreiteira: tipo === 'PARTICULAR' ? empreiteira : undefined,
       situacao,
       responsavel,
     });
+
+    try {
+      await HistoricoAlvara.create({
+        alvaraId: alvara._id,
+        numeroProjeto: alvara.numeroProjeto,
+        acao: 'criado',
+        usuarioId: req.usuario.id,
+        usuarioNome: req.usuario.nome,
+      });
+    } catch (histErr) {
+      console.error('Falha ao gravar histórico (criado):', histErr.message);
+    }
+
     res.status(201).json(alvara);
   } catch (err) {
     if (err.code === 11000) {
@@ -66,17 +85,51 @@ const CAMPOS_EDITAVEIS = [
   'enderecos',
 ];
 
+function valoresIguais(a, b) {
+  if (a instanceof Date || b instanceof Date) {
+    return new Date(a).getTime() === new Date(b).getTime();
+  }
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
 router.patch('/:id', async (req, res) => {
   try {
+    const antes = await Alvara.findById(req.params.id);
+    if (!antes) return res.status(404).json({ erro: 'Alvará não encontrado.' });
+
     const alteracoes = {};
+    const diff = {};
     for (const campo of CAMPOS_EDITAVEIS) {
-      if (req.body[campo] !== undefined) alteracoes[campo] = req.body[campo];
+      if (req.body[campo] === undefined) continue;
+      alteracoes[campo] = req.body[campo];
+      if (!valoresIguais(antes[campo], req.body[campo])) {
+        diff[campo] = { de: antes[campo], para: req.body[campo] };
+      }
     }
+
+    alteracoes.editadoPor = req.usuario.nome;
+    alteracoes.editadoEm = new Date();
+
     const alvara = await Alvara.findByIdAndUpdate(req.params.id, alteracoes, {
       new: true,
       runValidators: true,
     });
-    if (!alvara) return res.status(404).json({ erro: 'Alvará não encontrado.' });
+
+    if (Object.keys(diff).length > 0) {
+      try {
+        await HistoricoAlvara.create({
+          alvaraId: alvara._id,
+          numeroProjeto: alvara.numeroProjeto,
+          acao: 'editado',
+          usuarioId: req.usuario.id,
+          usuarioNome: req.usuario.nome,
+          alteracoes: diff,
+        });
+      } catch (histErr) {
+        console.error('Falha ao gravar histórico (editado):', histErr.message);
+      }
+    }
+
     res.json(alvara);
   } catch (err) {
     if (err.code === 11000) {
@@ -89,6 +142,27 @@ router.patch('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const alvara = await Alvara.findByIdAndDelete(req.params.id);
   if (!alvara) return res.status(404).json({ erro: 'Alvará não encontrado.' });
+
+  try {
+    await HistoricoAlvara.create({
+      alvaraId: alvara._id,
+      numeroProjeto: alvara.numeroProjeto,
+      acao: 'excluido',
+      usuarioId: req.usuario.id,
+      usuarioNome: req.usuario.nome,
+      alteracoes: {
+        snapshot: {
+          tipo: alvara.tipo,
+          situacao: alvara.situacao,
+          empreiteira: alvara.empreiteira,
+          responsavel: alvara.responsavel,
+        },
+      },
+    });
+  } catch (histErr) {
+    console.error('Falha ao gravar histórico (excluido):', histErr.message);
+  }
+
   res.status(204).end();
 });
 

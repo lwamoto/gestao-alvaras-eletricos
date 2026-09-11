@@ -3,14 +3,18 @@ import Sidebar from './components/Sidebar.jsx';
 import AlvaraForm from './components/AlvaraForm.jsx';
 import PesquisarAlvara from './components/PesquisarAlvara.jsx';
 import AlvaraDetalhePainel from './components/AlvaraDetalhePainel.jsx';
+import Login from './components/Login.jsx';
+import SolicitacaoImpressao from './components/SolicitacaoImpressao.jsx';
 import { createAlvara } from './api.js';
 import { FUNDOS_CADASTRO, indiceFundoAtual } from './fundoCadastro.js';
+import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 
 function lerEstadoUrl() {
   const params = new URLSearchParams(window.location.search);
   return {
     view: params.get('view') === 'pesquisar' ? 'pesquisar' : 'cadastrar',
     projeto: params.get('projeto'),
+    imprimir: params.get('imprimir'),
   };
 }
 
@@ -23,9 +27,18 @@ function lerSidebarRecolhida() {
 }
 
 export default function App() {
-  const [{ view, projetoAberto }, setEstado] = useState(() => {
+  return (
+    <AuthProvider>
+      <AppShell />
+    </AuthProvider>
+  );
+}
+
+function AppShell() {
+  const { usuario, carregando, logout } = useAuth();
+  const [{ view, projetoAberto, imprimirProjeto }, setEstado] = useState(() => {
     const inicial = lerEstadoUrl();
-    return { view: inicial.view, projetoAberto: inicial.projeto };
+    return { view: inicial.view, projetoAberto: inicial.projeto, imprimirProjeto: inicial.imprimir };
   });
   const [refreshKey, setRefreshKey] = useState(0);
   const [sidebarRecolhida, setSidebarRecolhida] = useState(lerSidebarRecolhida);
@@ -41,7 +54,7 @@ export default function App() {
   useEffect(() => {
     function aoNavegar() {
       const atual = lerEstadoUrl();
-      setEstado({ view: atual.view, projetoAberto: atual.projeto });
+      setEstado({ view: atual.view, projetoAberto: atual.projeto, imprimirProjeto: atual.imprimir });
     }
     window.addEventListener('popstate', aoNavegar);
     return () => window.removeEventListener('popstate', aoNavegar);
@@ -91,6 +104,22 @@ export default function App() {
     await createAlvara(data);
   }
 
+  if (carregando) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!usuario) {
+    return <Login />;
+  }
+
+  if (imprimirProjeto) {
+    return <SolicitacaoImpressao numeroProjeto={imprimirProjeto} />;
+  }
+
   const ePesquisar = view === 'pesquisar';
   const eCadastrar = view === 'cadastrar';
 
@@ -106,7 +135,14 @@ export default function App() {
         </div>
       )}
 
-      <Sidebar view={view} onNavigate={setView} collapsed={sidebarRecolhida} onToggleCollapse={alternarSidebar} />
+      <Sidebar
+        view={view}
+        onNavigate={setView}
+        collapsed={sidebarRecolhida}
+        onToggleCollapse={alternarSidebar}
+        usuario={usuario}
+        onLogout={logout}
+      />
       <main
         className={`transition-[padding-left] duration-200 ${sidebarRecolhida ? 'lg:pl-16' : 'lg:pl-64'} ${
           ePesquisar ? 'flex-1 min-h-0 flex flex-col' : ''

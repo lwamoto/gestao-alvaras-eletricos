@@ -36,6 +36,8 @@ const alvaraSchema = new mongoose.Schema(
     qtdPostes: { type: Number, default: 0 },
     qtdCaboM: { type: Number, default: 0 },
     enderecos: { type: [enderecoSchema], default: [] },
+    editadoPor: { type: String },
+    editadoEm: { type: Date },
   },
   { timestamps: true }
 );

@@ -1,28 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Globe, FilePlus, Search, Menu, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { FilePlus, Search, Menu, PanelLeftClose, PanelLeftOpen, LogOut } from 'lucide-react';
 import { EMPREITEIRAS } from '../constants.js';
+import BrandMark from './BrandMark.jsx';
 
 const NAV_ITEMS = [
   { key: 'cadastrar', label: 'Cadastrar Alvará', icon: FilePlus },
   { key: 'pesquisar', label: 'Pesquisar Alvará', icon: Search },
 ];
 
-function BrandMark({ collapsed = false }) {
-  return (
-    <div className="flex items-center gap-2.5">
-      <div className="w-8 h-8 border border-gray-300 bg-white rounded flex items-center justify-center shrink-0">
-        <Globe size={16} className="text-blue-600" />
-      </div>
-      {!collapsed && (
-        <p className="text-[15px] font-bold text-gray-900 tracking-tight leading-none whitespace-nowrap">
-          Sistema de Alvará
-        </p>
-      )}
-    </div>
-  );
-}
-
-export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse }) {
+export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse, usuario, onLogout }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [drawerMounted, setDrawerMounted] = useState(false);
   const [drawerEntered, setDrawerEntered] = useState(false);
@@ -123,11 +109,25 @@ export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse 
           )}
         </nav>
 
-        {!recolhida && (
-          <div className="px-5 py-4 border-t border-gray-100">
-            <p className="text-[10px] text-gray-400">COPEL Distribuição</p>
-          </div>
-        )}
+        <div className={`border-t border-gray-100 ${recolhida ? 'px-3 py-3 flex flex-col items-center gap-2' : 'px-5 py-4'}`}>
+          {!recolhida && (
+            <>
+              <p className="text-xs font-medium text-gray-700 truncate">{usuario?.nome}</p>
+              <p className="text-[10px] text-gray-400 mb-2">COPEL Distribuição</p>
+            </>
+          )}
+          <button
+            onClick={onLogout}
+            title="Sair"
+            aria-label="Sair"
+            className={`inline-flex items-center gap-1.5 text-gray-400 hover:text-red-600 transition-colors cursor-pointer ${
+              recolhida ? 'p-1.5 rounded hover:bg-red-50' : 'text-xs'
+            }`}
+          >
+            <LogOut size={recolhida ? 16 : 13} />
+            {!recolhida && 'Sair'}
+          </button>
+        </div>
       </>
     );
   }

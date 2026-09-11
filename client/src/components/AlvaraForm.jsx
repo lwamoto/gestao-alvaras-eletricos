@@ -3,7 +3,6 @@ import { FilePlus, ChevronDown, Check, AlertCircle } from 'lucide-react';
 import { TIPOS, EMPREITEIRAS } from '../constants.js';
 
 const vazio = {
-  incluidoPor: '',
   numeroProjeto: '',
   tipo: '',
   empreiteira: '',
@@ -60,20 +59,6 @@ export default function AlvaraForm({ onCreate }) {
       <div className="bg-white border border-gray-200 rounded-md shadow-sm">
         <form onSubmit={handleSubmit} className="p-6 sm:p-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div>
-              <label className="block mb-1.5 text-xs font-medium text-gray-600">
-                Incluído por
-              </label>
-              <input
-                type="text"
-                placeholder="Nome de quem cadastra"
-                value={form.incluidoPor}
-                onChange={(e) => setForm({ ...form, incluidoPor: e.target.value })}
-                required
-                className={inputCls}
-              />
-            </div>
-
             <div>
               <label className="block mb-1.5 text-xs font-medium text-gray-600">
                 Número do projeto

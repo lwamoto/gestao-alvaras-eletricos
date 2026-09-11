@@ -62,3 +62,8 @@ button:focus-visible {
 ::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
+
+@page {
+  size: A4;
+  margin: 15mm;
+}

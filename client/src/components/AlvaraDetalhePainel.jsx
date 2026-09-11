@@ -8,6 +8,7 @@ import {
   MapPin,
   Check,
   AlertCircle,
+  Printer,
 } from 'lucide-react';
 import { getAlvaraPorProjeto, updateAlvara, deleteAlvara } from '../api.js';
 import { corDoTipo, corDoNumero } from '../cores.js';
@@ -401,6 +402,13 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                     <Trash2 size={13} />
                     Excluir
                   </button>
+                  <button
+                    onClick={() => window.open(`/?imprimir=${encodeURIComponent(alvara.numeroProjeto)}`, '_blank')}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded hover:bg-gray-50 active:scale-[0.97] transition-all cursor-pointer"
+                  >
+                    <Printer size={13} />
+                    Imprimir
+                  </button>
                 </>
               ) : (
                 <>
@@ -488,6 +496,13 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                     <LinhaCampo label="Criado em">
                       <span className="text-sm text-gray-900">{formatarData(alvara.createdAt)}</span>
                     </LinhaCampo>
+                    {alvara.editadoPor && (
+                      <LinhaCampo label="Última alteração">
+                        <span className="text-sm text-gray-900">
+                          {alvara.editadoPor} em {formatarData(alvara.editadoEm)}
+                        </span>
+                      </LinhaCampo>
+                    )}
                   </div>
                 )}
 
