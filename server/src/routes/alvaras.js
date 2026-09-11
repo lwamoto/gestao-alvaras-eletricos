@@ -10,8 +10,21 @@ router.get('/', async (req, res) => {
   if (req.query.busca) filtro.numeroProjeto = { $regex: req.query.busca, $options: 'i' };
   if (req.query.empreiteira) filtro.empreiteira = req.query.empreiteira;
 
-  const alvaras = await Alvara.find(filtro).sort({ createdAt: -1 });
-  res.json(alvaras);
+  const pagina = Math.max(1, parseInt(req.query.pagina, 10) || 1);
+  const limite = Math.min(200, Math.max(1, parseInt(req.query.limite, 10) || 50));
+
+  const [total, dados] = await Promise.all([
+    Alvara.countDocuments(filtro),
+    Alvara.find(filtro)
+      .sort({ createdAt: -1 })
+      .skip((pagina - 1) * limite)
+      .limit(limite),
+  ]);
+
+  res.json({
+    dados,
+    paginacao: { pagina, limite, total, totalPaginas: Math.max(1, Math.ceil(total / limite)) },
+  });
 });
 
 router.get('/projeto/:numeroProjeto', async (req, res) => {

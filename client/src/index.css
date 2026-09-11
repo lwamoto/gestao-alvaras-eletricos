@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+:root {
+  --ease-fluid: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
 body {
   margin: 0;
   font-family: 'Inter Variable', system-ui, -apple-system, sans-serif;
@@ -7,6 +11,26 @@ body {
   color: #111827;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes tab-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Reduced motion still shows the state change, just without the travel */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 *:focus {

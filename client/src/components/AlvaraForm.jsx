@@ -57,7 +57,7 @@ export default function AlvaraForm({ onCreate }) {
         </p>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-md">
+      <div className="bg-white border border-gray-200 rounded-md shadow-sm">
         <form onSubmit={handleSubmit} className="p-6 sm:p-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
@@ -94,7 +94,7 @@ export default function AlvaraForm({ onCreate }) {
                 <button
                   type="button"
                   onClick={() => setTipoAberto((v) => !v)}
-                  className="w-full flex items-center justify-between px-3.5 py-2.5 border border-gray-300 bg-white rounded text-sm text-left hover:border-gray-400 transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-between px-3.5 py-2.5 border border-gray-300 bg-white rounded text-sm text-left hover:border-gray-400 active:scale-[0.99] transition-all cursor-pointer"
                 >
                   {form.tipo ? (
                     <span className={`inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded ${corTag[form.tipo]}`}>
@@ -103,17 +103,22 @@ export default function AlvaraForm({ onCreate }) {
                   ) : (
                     <span className="text-gray-400">Selecione o modelo</span>
                   )}
-                  <ChevronDown size={16} className={`text-gray-400 transition-transform ${tipoAberto ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    size={16}
+                    className={`text-gray-400 transition-transform duration-200 ease-[var(--ease-fluid)] ${tipoAberto ? 'rotate-180' : ''}`}
+                  />
                 </button>
 
                 {tipoAberto && (
-                  <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded shadow-sm z-10 py-1">
+                  <div
+                    className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded shadow-sm z-10 py-1 origin-top animate-[pop-in_160ms_var(--ease-fluid)]"
+                  >
                     {TIPOS.map((t) => (
                       <button
                         key={t.valor}
                         type="button"
                         onClick={() => escolherTipo(t.valor)}
-                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm hover:bg-gray-50 transition-colors cursor-pointer ${
+                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer ${
                           form.tipo === t.valor ? 'font-medium' : ''
                         }`}
                       >

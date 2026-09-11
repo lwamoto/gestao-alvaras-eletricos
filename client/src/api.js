@@ -6,6 +6,8 @@ export async function listAlvaras(filtros = {}) {
   if (filtros.situacao) params.set('situacao', filtros.situacao);
   if (filtros.busca) params.set('busca', filtros.busca);
   if (filtros.empreiteira) params.set('empreiteira', filtros.empreiteira);
+  if (filtros.pagina) params.set('pagina', filtros.pagina);
+  if (filtros.limite) params.set('limite', filtros.limite);
 
   const query = params.toString();
   const res = await fetch(query ? `${API_URL}?${query}` : API_URL);

@@ -26,3 +26,4 @@ Thumbs.db
 # Cache
 .vite/
 .cache/
+.impeccable/hook.cache.json

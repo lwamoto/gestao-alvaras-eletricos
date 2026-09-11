@@ -1,0 +1,35 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "client/src/components/AlvaraForm.jsx"
+        ],
+        "createdAt": "2026-09-11T12:11:14.956Z",
+        "reason": "disabled submit button (gray-400 on gray-200), standard disabled convention, already reviewed earlier this session"
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "client/src/components/AlvaraDetalhePage.jsx"
+        ],
+        "createdAt": "2026-09-11T12:11:36.740Z",
+        "reason": "disabled Salvar button (gray-400 on gray-200, standard disabled convention) and remove-address icon button (gray-400 default state; red-50 bg only co-occurs with red-500 text on hover, never with gray text) — both pre-existing, not touched by current edit"
+      },
+      {
+        "rule": "gray-on-color",
+        "value": "*",
+        "files": [
+          "client/src/components/AlvaraDetalhePainel.jsx"
+        ],
+        "createdAt": "2026-09-11T13:00:31.357Z",
+        "reason": "same pre-existing false positives migrated from AlvaraDetalhePage.jsx: disabled Salvar button (gray-400 on gray-200) and remove-address icon (gray-400 default, red-50 bg only co-occurs with red-500 text on hover)"
+      }
+    ]
+  }
+}
