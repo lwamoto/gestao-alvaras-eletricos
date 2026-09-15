@@ -5,6 +5,8 @@ import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import alvarasRouter from './routes/alvaras.js';
 import authRouter from './routes/auth.js';
+import usuariosRouter from './routes/usuarios.js';
+import empreiteirasRouter from './routes/empreiteiras.js';
 import { requireAuth } from './middleware/auth.js';
 
 const app = express();
@@ -14,6 +16,8 @@ app.use(cookieParser());
 
 app.use('/api/auth', authRouter);
 app.use('/api/alvaras', requireAuth, alvarasRouter);
+app.use('/api/usuarios', requireAuth, usuariosRouter);
+app.use('/api/empreiteiras', requireAuth, empreiteirasRouter);
 
 const PORT = process.env.PORT || 4000;
 

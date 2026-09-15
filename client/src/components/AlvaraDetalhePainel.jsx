@@ -13,6 +13,7 @@ import {
 import { getAlvaraPorProjeto, updateAlvara, deleteAlvara } from '../api.js';
 import { corDoTipo, corDoNumero } from '../cores.js';
 import { NATUREZAS_SERVICOS } from '../constants.js';
+import { useAuth } from '../contexts/AuthContext.jsx';
 
 const SITUACOES = ['A_FAZER', 'ENVIADO', 'RECEBIDO'];
 
@@ -96,6 +97,8 @@ function formToState(dados) {
 }
 
 export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomeado }) {
+  const { usuario } = useAuth();
+  const podeEditar = usuario?.tipo !== 'EMPREITEIRA';
   const [numeroProjetoExibido, setNumeroProjetoExibido] = useState(numeroProjeto);
   const [painelMontado, setPainelMontado] = useState(!!numeroProjeto);
   const [painelEntrou, setPainelEntrou] = useState(false);
@@ -389,19 +392,23 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
             <div className="flex items-center gap-2 px-5 py-3 border-b border-gray-100 shrink-0">
               {!editando ? (
                 <>
-                  <button
-                    onClick={() => setEditando(true)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-copel-laranja text-white text-xs font-medium rounded hover:brightness-90 active:scale-[0.97] transition-all cursor-pointer"
-                  >
-                    Alterar
-                  </button>
-                  <button
-                    onClick={handleExcluir}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-gray-300 text-red-600 text-xs font-medium rounded hover:bg-red-50 active:scale-[0.97] transition-all cursor-pointer"
-                  >
-                    <Trash2 size={13} />
-                    Excluir
-                  </button>
+                  {podeEditar && (
+                    <>
+                      <button
+                        onClick={() => setEditando(true)}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-copel-laranja text-white text-xs font-medium rounded hover:brightness-90 active:scale-[0.97] transition-all cursor-pointer"
+                      >
+                        Alterar
+                      </button>
+                      <button
+                        onClick={handleExcluir}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-gray-300 text-red-600 text-xs font-medium rounded hover:bg-red-50 active:scale-[0.97] transition-all cursor-pointer"
+                      >
+                        <Trash2 size={13} />
+                        Excluir
+                      </button>
+                    </>
+                  )}
                   <button
                     onClick={() => window.open(`/?imprimir=${encodeURIComponent(alvara.numeroProjeto)}`, '_blank')}
                     className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-gray-300 text-copel-grafite text-xs font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"

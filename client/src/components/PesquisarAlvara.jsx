@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Search, Inbox, Calendar, ChevronLeft, ChevronRight, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { listAlvaras, updateAlvara } from '../api.js';
-import { TIPOS, EMPREITEIRAS } from '../constants.js';
+import { TIPOS } from '../constants.js';
+import { listEmpreiteiras } from '../empreiteirasApi.js';
 import { corDoTipo, corDoNumero } from '../cores.js';
 
 const LIMITE = 50;
@@ -59,7 +60,12 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
   const [filtrosAbertos, setFiltrosAbertos] = useState(false);
+  const [empreiteiras, setEmpreiteiras] = useState([]);
   const filtrosRef = useRef(null);
+
+  useEffect(() => {
+    listEmpreiteiras().then(setEmpreiteiras).catch(() => setEmpreiteiras([]));
+  }, []);
 
   const carregar = useCallback(async (params) => {
     setCarregando(true);
@@ -172,8 +178,8 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
                   className={selectCls}
                 >
                   <option value="">Todas as empreiteiras</option>
-                  {EMPREITEIRAS.map((emp) => (
-                    <option key={emp} value={emp}>{emp}</option>
+                  {empreiteiras.map((emp) => (
+                    <option key={emp._id} value={emp.nome}>{emp.nome}</option>
                   ))}
                 </select>
               </div>

@@ -5,14 +5,19 @@ import PesquisarAlvara from './components/PesquisarAlvara.jsx';
 import AlvaraDetalhePainel from './components/AlvaraDetalhePainel.jsx';
 import Login from './components/Login.jsx';
 import SolicitacaoImpressao from './components/SolicitacaoImpressao.jsx';
+import UsuariosAdmin from './components/UsuariosAdmin.jsx';
+import EmpreiteirasAdmin from './components/EmpreiteirasAdmin.jsx';
 import { createAlvara } from './api.js';
 import { FUNDOS_CADASTRO, indiceFundoAtual } from './fundoCadastro.js';
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 
+const VIEWS_VALIDAS = ['cadastrar', 'pesquisar', 'usuarios', 'empreiteiras'];
+
 function lerEstadoUrl() {
   const params = new URLSearchParams(window.location.search);
+  const view = params.get('view');
   return {
-    view: params.get('view') === 'pesquisar' ? 'pesquisar' : 'cadastrar',
+    view: VIEWS_VALIDAS.includes(view) ? view : 'cadastrar',
     projeto: params.get('projeto'),
     imprimir: params.get('imprimir'),
   };
@@ -120,8 +125,13 @@ function AppShell() {
     return <SolicitacaoImpressao numeroProjeto={imprimirProjeto} />;
   }
 
-  const ePesquisar = view === 'pesquisar';
-  const eCadastrar = view === 'cadastrar';
+  // Usuário EMPREITEIRA só enxerga a pesquisa (só leitura, escopada à própria
+  // empreiteira no backend) — qualquer outra view cai pra pesquisar.
+  const viewsPermitidas = usuario.tipo === 'EMPREITEIRA' ? ['pesquisar'] : VIEWS_VALIDAS;
+  const viewEfetiva = viewsPermitidas.includes(view) ? view : 'pesquisar';
+
+  const ePesquisar = viewEfetiva === 'pesquisar';
+  const eCadastrar = viewEfetiva === 'cadastrar';
 
   return (
     <div className={ePesquisar ? 'h-screen overflow-hidden flex flex-col bg-copel-cinza' : 'min-h-screen'}>
@@ -136,7 +146,7 @@ function AppShell() {
       )}
 
       <Sidebar
-        view={view}
+        view={viewEfetiva}
         onNavigate={setView}
         collapsed={sidebarRecolhida}
         onToggleCollapse={alternarSidebar}
@@ -148,13 +158,24 @@ function AppShell() {
           ePesquisar ? 'flex-1 min-h-0 flex flex-col' : ''
         }`}
       >
-        {view === 'cadastrar' ? (
+        {viewEfetiva === 'cadastrar' && (
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <AlvaraForm onCreate={handleCreate} />
           </div>
-        ) : (
+        )}
+        {viewEfetiva === 'pesquisar' && (
           <div className="flex-1 min-h-0 flex flex-col">
             <PesquisarAlvara onAbrirDetalhe={abrirDetalhe} refreshKey={refreshKey} />
+          </div>
+        )}
+        {viewEfetiva === 'usuarios' && (
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <UsuariosAdmin usuarioLogado={usuario} />
+          </div>
+        )}
+        {viewEfetiva === 'empreiteiras' && (
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <EmpreiteirasAdmin />
           </div>
         )}
       </main>

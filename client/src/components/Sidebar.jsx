@@ -1,17 +1,23 @@
 import { useEffect, useState } from 'react';
-import { FilePlus, Search, Menu, PanelLeftClose, PanelLeftOpen, LogOut } from 'lucide-react';
-import { EMPREITEIRAS } from '../constants.js';
+import { FilePlus, Search, Menu, PanelLeftClose, PanelLeftOpen, LogOut, Users, Building2 } from 'lucide-react';
 import BrandMark from './BrandMark.jsx';
 
-const NAV_ITEMS = [
+const NAV_ITEMS_COPEL = [
   { key: 'cadastrar', label: 'Cadastrar Alvará', icon: FilePlus },
   { key: 'pesquisar', label: 'Pesquisar Alvará', icon: Search },
+  { key: 'usuarios', label: 'Usuários', icon: Users },
+  { key: 'empreiteiras', label: 'Empreiteiras', icon: Building2 },
+];
+
+const NAV_ITEMS_EMPREITEIRA = [
+  { key: 'pesquisar', label: 'Meus Alvarás', icon: Search },
 ];
 
 export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse, usuario, onLogout }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [drawerMounted, setDrawerMounted] = useState(false);
   const [drawerEntered, setDrawerEntered] = useState(false);
+  const navItems = usuario?.tipo === 'EMPREITEIRA' ? NAV_ITEMS_EMPREITEIRA : NAV_ITEMS_COPEL;
 
   // Mount first, then flip to "entered" a frame later so the transition has
   // a starting value to animate from (React can't transition a first paint).
@@ -60,7 +66,7 @@ export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse,
 
         <nav className="flex-1 px-3 pb-4">
           <ul className="space-y-0.5">
-            {NAV_ITEMS.map(({ key, label, icon: Icon }) => {
+            {navItems.map(({ key, label, icon: Icon }) => {
               const ativo = view === key;
               return (
                 <li key={key}>
@@ -89,31 +95,15 @@ export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse,
               );
             })}
           </ul>
-
-          {!recolhida && (
-            <>
-              <h3 className="mt-8 mb-2 pl-3 text-[10px] font-semibold text-copel-cinza-medio uppercase tracking-wider">
-                Empreiteiras
-              </h3>
-              <ul>
-                {EMPREITEIRAS.map((emp) => (
-                  <li
-                    key={emp}
-                    className="pl-3 pr-4 py-1.5 text-xs text-copel-cinza-medio hover:text-copel-grafite transition-colors"
-                  >
-                    {emp}
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
         </nav>
 
         <div className={`border-t border-gray-100 ${recolhida ? 'px-3 py-3 flex flex-col items-center gap-2' : 'px-5 py-4'}`}>
           {!recolhida && (
             <>
               <p className="text-xs font-medium text-copel-grafite truncate">{usuario?.nome}</p>
-              <p className="text-[10px] text-copel-cinza-medio mb-2">COPEL Distribuição</p>
+              <p className="text-[10px] text-copel-cinza-medio mb-2">
+                {usuario?.tipo === 'EMPREITEIRA' ? usuario.empreiteira : 'COPEL Distribuição'}
+              </p>
             </>
           )}
           <button

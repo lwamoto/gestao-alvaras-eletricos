@@ -19,6 +19,19 @@ const usuarioSchema = new mongoose.Schema(
       sparse: true,
     },
     senhaHash: { type: String, required: true, select: false },
+    tipo: {
+      type: String,
+      enum: ['COPEL', 'EMPREITEIRA'],
+      required: true,
+      default: 'COPEL',
+    },
+    // Só preenchido quando tipo === 'EMPREITEIRA' — restringe o que o usuário
+    // enxerga no sistema à empreiteira dele (ver requireAuth/escopoAlvaras).
+    empreiteira: {
+      type: String,
+      trim: true,
+      uppercase: true,
+    },
   },
   { timestamps: true }
 );
@@ -26,6 +39,10 @@ const usuarioSchema = new mongoose.Schema(
 usuarioSchema.pre('validate', function (next) {
   if (!this.email && !this.chaveAcesso) {
     next(new Error('Informe pelo menos um e-mail ou uma chave de acesso.'));
+    return;
+  }
+  if (this.tipo === 'EMPREITEIRA' && !this.empreiteira) {
+    next(new Error('Informe a empreiteira para usuários do tipo EMPREITEIRA.'));
     return;
   }
   next();

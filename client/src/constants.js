@@ -4,21 +4,6 @@ export const TIPOS = [
   { valor: 'PARTICULAR', cor: 'vermelho' },
 ];
 
-export const EMPREITEIRAS = [
-  'AVANTI',
-  'CONTREL',
-  'CONSTRUCEL',
-  'ELENG',
-  'ELETROCHESKI',
-  'ENERGY',
-  'FELTRIN',
-  'JB',
-  'OCLE',
-  'PROENGE',
-  'SERPA',
-  'TDA',
-];
-
 export const NATUREZAS_SERVICOS = [
   { valor: '5', label: '5', descricao: 'Substituição/lançamento de postes de energia elétrica' },
   { valor: '9', label: '9', descricao: 'Lançamento de cabos aéreos de energia elétrica' },

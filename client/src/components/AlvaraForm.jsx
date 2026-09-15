@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FilePlus, ChevronDown, Check, AlertCircle } from 'lucide-react';
-import { TIPOS, EMPREITEIRAS } from '../constants.js';
+import { TIPOS } from '../constants.js';
+import { listEmpreiteiras } from '../empreiteirasApi.js';
 
 const vazio = {
   numeroProjeto: '',
@@ -24,6 +25,11 @@ export default function AlvaraForm({ onCreate }) {
   const [sucesso, setSucesso] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [tipoAberto, setTipoAberto] = useState(false);
+  const [empreiteiras, setEmpreiteiras] = useState([]);
+
+  useEffect(() => {
+    listEmpreiteiras({ somenteAtivas: true }).then(setEmpreiteiras).catch(() => setEmpreiteiras([]));
+  }, []);
 
   function escolherTipo(tipo) {
     setForm({ ...form, tipo, empreiteira: tipo === 'PARTICULAR' ? form.empreiteira : '' });
@@ -133,8 +139,8 @@ export default function AlvaraForm({ onCreate }) {
                   className={inputCls}
                 >
                   <option value="">Selecione a empreiteira</option>
-                  {EMPREITEIRAS.map((emp) => (
-                    <option key={emp} value={emp}>{emp}</option>
+                  {empreiteiras.map((emp) => (
+                    <option key={emp._id} value={emp.nome}>{emp.nome}</option>
                   ))}
                 </select>
               </div>

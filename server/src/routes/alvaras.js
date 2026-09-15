@@ -1,15 +1,34 @@
 import { Router } from 'express';
 import Alvara from '../models/Alvara.js';
 import HistoricoAlvara from '../models/HistoricoAlvara.js';
+import Empreiteira from '../models/Empreiteira.js';
+import { requireCopel } from '../middleware/auth.js';
 
 const router = Router();
 
+// Usuário EMPREITEIRA só enxerga os próprios alvarás PARTICULAR — aplicado
+// direto no filtro da query, nunca confiando em tipo/empreiteira vindos do
+// client (query params são ignorados/sobrescritos nesse caso).
+function aplicarEscopo(filtro, usuario) {
+  if (usuario.tipo === 'EMPREITEIRA') {
+    return { ...filtro, tipo: 'PARTICULAR', empreiteira: usuario.empreiteira };
+  }
+  return filtro;
+}
+
+async function validarEmpreiteira(nome) {
+  if (!nome) return true;
+  const existe = await Empreiteira.findOne({ nome: nome.toUpperCase(), ativo: true });
+  return !!existe;
+}
+
 router.get('/', async (req, res) => {
-  const filtro = {};
+  let filtro = {};
   if (req.query.tipo) filtro.tipo = req.query.tipo;
   if (req.query.situacao) filtro.situacao = req.query.situacao;
   if (req.query.busca) filtro.numeroProjeto = { $regex: req.query.busca, $options: 'i' };
   if (req.query.empreiteira) filtro.empreiteira = req.query.empreiteira;
+  filtro = aplicarEscopo(filtro, req.usuario);
 
   const pagina = Math.max(1, parseInt(req.query.pagina, 10) || 1);
   const limite = Math.min(200, Math.max(1, parseInt(req.query.limite, 10) || 50));
@@ -29,19 +48,25 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/projeto/:numeroProjeto', async (req, res) => {
-  const alvara = await Alvara.findOne({ numeroProjeto: req.params.numeroProjeto });
+  const filtro = aplicarEscopo({ numeroProjeto: req.params.numeroProjeto }, req.usuario);
+  const alvara = await Alvara.findOne(filtro);
   if (!alvara) return res.status(404).json({ erro: 'Alvará não encontrado.' });
   res.json(alvara);
 });
 
-router.get('/:id/historico', async (req, res) => {
+router.get('/:id/historico', requireCopel, async (req, res) => {
   const eventos = await HistoricoAlvara.find({ alvaraId: req.params.id }).sort({ createdAt: -1 });
   res.json(eventos);
 });
 
-router.post('/', async (req, res) => {
+router.post('/', requireCopel, async (req, res) => {
   try {
     const { numeroProjeto, tipo, empreiteira, situacao, responsavel } = req.body;
+
+    if (tipo === 'PARTICULAR' && !(await validarEmpreiteira(empreiteira))) {
+      return res.status(400).json({ erro: 'Empreiteira inválida ou inativa.' });
+    }
+
     const alvara = await Alvara.create({
       incluidoPor: req.usuario.nome,
       numeroProjeto,
@@ -92,7 +117,7 @@ function valoresIguais(a, b) {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', requireCopel, async (req, res) => {
   try {
     const antes = await Alvara.findById(req.params.id);
     if (!antes) return res.status(404).json({ erro: 'Alvará não encontrado.' });
@@ -139,7 +164,7 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireCopel, async (req, res) => {
   const alvara = await Alvara.findByIdAndDelete(req.params.id);
   if (!alvara) return res.status(404).json({ erro: 'Alvará não encontrado.' });
 

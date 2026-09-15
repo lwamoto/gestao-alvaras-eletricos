@@ -13,7 +13,14 @@ const COOKIE_OPTS = {
 };
 
 function paraCliente(usuario) {
-  return { id: usuario._id, nome: usuario.nome, email: usuario.email || null, chaveAcesso: usuario.chaveAcesso || null };
+  return {
+    id: usuario._id,
+    nome: usuario.nome,
+    email: usuario.email || null,
+    chaveAcesso: usuario.chaveAcesso || null,
+    tipo: usuario.tipo,
+    empreiteira: usuario.empreiteira || null,
+  };
 }
 
 router.post('/login', async (req, res) => {
@@ -28,7 +35,13 @@ router.post('/login', async (req, res) => {
   }
 
   const token = jwt.sign(
-    { id: usuario._id, nome: usuario.nome, email: usuario.email },
+    {
+      id: usuario._id,
+      nome: usuario.nome,
+      email: usuario.email,
+      tipo: usuario.tipo,
+      empreiteira: usuario.empreiteira || null,
+    },
     process.env.JWT_SECRET,
     { expiresIn: '7d' }
   );

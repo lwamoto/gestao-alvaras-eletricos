@@ -17,9 +17,13 @@ const alvaraSchema = new mongoose.Schema(
     incluidoPor: { type: String, required: true, trim: true },
     numeroProjeto: { type: String, required: true, unique: true, trim: true },
     tipo: { type: String, required: true, enum: ['CONSUMIDOR', 'PARTICULAR', 'POO'] },
+    // Validada contra a coleção Empreiteira nas rotas de criação/edição
+    // (server/src/routes/alvaras.js) — não usamos mongoose `enum` aqui porque
+    // a lista agora é gerenciável via CRUD, não fixa no schema.
     empreiteira: {
       type: String,
-      enum: ['AVANTI', 'CONTREL', 'CONSTRUCEL', 'ELENG', 'ELETROCHESKI', 'ENERGY', 'FELTRIN', 'JB', 'OCLE', 'PROENGE', 'SERPA', 'TDA'],
+      trim: true,
+      uppercase: true,
       required: [function () { return this.tipo === 'PARTICULAR'; }, 'Empreiteira é obrigatória para alvará PARTICULAR'],
     },
     situacao: {
