@@ -16,7 +16,7 @@ const corTag = {
 };
 
 const inputCls =
-  'w-full px-3.5 py-2.5 border border-gray-300 bg-white rounded text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 transition-colors';
+  'w-full px-3.5 py-2.5 border border-gray-300 bg-white rounded text-sm text-gray-900 placeholder:text-gray-400 focus:border-orange-500 transition-colors';
 
 export default function AlvaraForm({ onCreate }) {
   const [form, setForm] = useState(vazio);
@@ -115,7 +115,7 @@ export default function AlvaraForm({ onCreate }) {
                           {t.valor === 'PARTICULAR' && 'Via empreiteira'}
                           {t.valor === 'POO' && 'Tipo raro, sem empreiteira'}
                         </span>
-                        {form.tipo === t.valor && <Check size={15} className="text-blue-600 ml-auto" />}
+                        {form.tipo === t.valor && <Check size={15} className="text-orange-600 ml-auto" />}
                       </button>
                     ))}
                   </div>
@@ -172,7 +172,7 @@ export default function AlvaraForm({ onCreate }) {
             <button
               type="submit"
               disabled={enviando || !form.tipo}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-600 text-white text-sm font-medium rounded hover:bg-orange-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
               <FilePlus size={16} />
               {enviando ? 'Salvando...' : 'Adicionar Alvará'}

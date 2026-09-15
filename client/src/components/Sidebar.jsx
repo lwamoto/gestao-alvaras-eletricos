@@ -72,11 +72,11 @@ export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse,
                       recolhida ? 'justify-center gap-0 px-0' : 'gap-3 pl-3 pr-4'
                     } ${
                       ativo
-                        ? 'bg-blue-50/60 border-blue-600 text-blue-700'
+                        ? 'bg-orange-50/60 border-orange-600 text-orange-700'
                         : 'border-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                     }`}
                   >
-                    <Icon size={17} className={`shrink-0 ${ativo ? 'text-blue-600' : 'text-gray-400'}`} />
+                    <Icon size={17} className={`shrink-0 ${ativo ? 'text-orange-600' : 'text-gray-400'}`} />
                     <span
                       className={`whitespace-nowrap overflow-hidden transition-all duration-150 ${
                         recolhida ? 'opacity-0 max-w-0' : 'opacity-100 max-w-[160px]'

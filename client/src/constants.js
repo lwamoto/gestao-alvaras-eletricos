@@ -6,14 +6,17 @@ export const TIPOS = [
 
 export const EMPREITEIRAS = [
   'AVANTI',
+  'CONTREL',
   'CONSTRUCEL',
-  'CONTEL',
   'ELENG',
-  'ENERGY',
   'ELETROCHESKI',
-  'JB',
-  'PROENG',
+  'ENERGY',
   'FELTRIN',
+  'JB',
+  'OCLE',
+  'PROENGE',
+  'SERPA',
+  'TDA',
 ];
 
 export const NATUREZAS_SERVICOS = [

@@ -26,7 +26,7 @@ const SITUACAO_BADGE = {
 };
 
 const selectCls =
-  'w-full px-2.5 py-1.5 border border-gray-200 bg-white rounded text-sm text-gray-700 focus:border-blue-500 transition-colors';
+  'w-full px-2.5 py-1.5 border border-gray-200 bg-white rounded text-sm text-gray-700 focus:border-orange-500 transition-colors';
 
 const filtroLabelCls = 'block mb-1 text-[10px] font-semibold text-gray-500 uppercase tracking-wider';
 
@@ -131,7 +131,7 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
             placeholder="Buscar por número do projeto..."
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-md placeholder:text-gray-400 focus:border-blue-500 transition-colors"
+            className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-md placeholder:text-gray-400 focus:border-orange-500 transition-colors"
           />
         </div>
 
@@ -144,7 +144,7 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
             Filtros
             <ChevronDown size={13} className={`text-gray-400 transition-transform duration-150 ${filtrosAbertos ? 'rotate-180' : ''}`} />
             {qtdFiltrosAtivos > 0 && (
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-blue-600 ring-2 ring-white" />
+              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-orange-600 ring-2 ring-white" />
             )}
           </button>
 
@@ -195,7 +195,7 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
               {qtdFiltrosAtivos > 0 && (
                 <button
                   onClick={() => setFiltros({ tipo: '', empreiteira: '', situacao: '' })}
-                  className="text-xs text-blue-600 hover:underline self-start cursor-pointer"
+                  className="text-xs text-orange-600 hover:underline self-start cursor-pointer"
                 >
                   Limpar filtros
                 </button>
@@ -222,7 +222,7 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
               {temFiltros && (
                 <button
                   onClick={limparFiltros}
-                  className="mt-3 text-sm text-blue-600 hover:underline cursor-pointer"
+                  className="mt-3 text-sm text-orange-600 hover:underline cursor-pointer"
                 >
                   Limpar filtros
                 </button>
@@ -305,7 +305,7 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
                                 value={paraInputDate(a.dataMarcada || a.createdAt)}
                                 onClick={(e) => e.stopPropagation()}
                                 onChange={(e) => handleChangeData(a._id, e.target.value)}
-                                className="border border-gray-300 rounded px-1.5 py-1 text-xs font-medium text-gray-600 focus:border-blue-500 transition-colors"
+                                className="border border-gray-300 rounded px-1.5 py-1 text-xs font-medium text-gray-600 focus:border-orange-500 transition-colors"
                               />
                             </div>
                           </td>
@@ -347,7 +347,7 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
                     onClick={() => setPagina(p)}
                     className={`min-w-[28px] px-2 py-1.5 text-xs font-medium rounded transition-colors cursor-pointer ${
                       p === pagina
-                        ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                        ? 'bg-orange-50 text-orange-700 border border-orange-200'
                         : 'text-gray-600 border border-transparent hover:bg-gray-50'
                     }`}
                   >

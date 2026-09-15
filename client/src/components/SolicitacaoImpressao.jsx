@@ -66,7 +66,7 @@ export default function SolicitacaoImpressao({ numeroProjeto }) {
   if (carregando) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-orange-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -93,7 +93,7 @@ export default function SolicitacaoImpressao({ numeroProjeto }) {
         </span>
         <button
           onClick={() => window.print()}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm font-medium transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 rounded text-sm font-medium transition-colors cursor-pointer"
         >
           <Printer size={16} />
           Imprimir

@@ -5,7 +5,7 @@ import { FUNDOS_CADASTRO, indiceFundoAtual } from '../fundoCadastro.js';
 import BrandMark from './BrandMark.jsx';
 
 const inputCls =
-  'w-full px-3.5 py-2.5 border border-gray-300 bg-white rounded text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 transition-colors';
+  'w-full px-3.5 py-2.5 border border-gray-300 bg-white rounded text-sm text-gray-900 placeholder:text-gray-400 focus:border-orange-500 transition-colors';
 
 export default function Login() {
   const { login } = useAuth();
@@ -80,7 +80,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={enviando}
-            className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-orange-600 text-white text-sm font-medium rounded hover:bg-orange-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             <LogIn size={16} />
             {enviando ? 'Entrando...' : 'Entrar'}

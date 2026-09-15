@@ -30,10 +30,10 @@ const COR_TEXTO = {
 };
 
 const inputCls =
-  'px-3 py-2 border border-gray-300 bg-white rounded text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 transition-colors';
+  'px-3 py-2 border border-gray-300 bg-white rounded text-sm text-gray-900 placeholder:text-gray-400 focus:border-orange-500 transition-colors';
 
 const inputNumCls =
-  'px-3 py-2 border border-gray-300 bg-white rounded text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 transition-colors w-full';
+  'px-3 py-2 border border-gray-300 bg-white rounded text-sm text-gray-900 placeholder:text-gray-400 focus:border-orange-500 transition-colors w-full';
 
 const LARGURA_MIN = 420;
 const LARGURA_MAX = 1100;
@@ -336,13 +336,13 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
           role="separator"
           aria-orientation="vertical"
           aria-label="Redimensionar painel"
-          className="absolute left-0 top-0 bottom-0 w-1.5 -translate-x-1/2 cursor-col-resize hover:bg-blue-200/60 active:bg-blue-300/70 transition-colors z-10 touch-none"
+          className="absolute left-0 top-0 bottom-0 w-1.5 -translate-x-1/2 cursor-col-resize hover:bg-orange-200/60 active:bg-orange-300/70 transition-colors z-10 touch-none"
         />
 
         {carregando ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+              <div className="w-8 h-8 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
               <p className="text-sm text-gray-500">Carregando...</p>
             </div>
           </div>
@@ -353,7 +353,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
               <p className="text-sm text-red-600">{erro}</p>
               <button
                 onClick={onFechar}
-                className="mt-4 text-sm text-blue-600 hover:underline cursor-pointer"
+                className="mt-4 text-sm text-orange-600 hover:underline cursor-pointer"
               >
                 Fechar
               </button>
@@ -391,7 +391,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                 <>
                   <button
                     onClick={() => setEditando(true)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 active:scale-[0.97] transition-all cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-600 text-white text-xs font-medium rounded hover:bg-orange-700 active:scale-[0.97] transition-all cursor-pointer"
                   >
                     Alterar
                   </button>
@@ -422,7 +422,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                   <button
                     onClick={handleSalvar}
                     disabled={salvando}
-                    className="px-3.5 py-1.5 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 active:scale-[0.97] transition-all cursor-pointer"
+                    className="px-3.5 py-1.5 bg-orange-600 text-white text-xs font-medium rounded hover:bg-orange-700 disabled:bg-gray-200 disabled:text-gray-400 active:scale-[0.97] transition-all cursor-pointer"
                   >
                     {salvando ? 'Salvando...' : 'Salvar'}
                   </button>
@@ -453,7 +453,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                     onClick={() => setAbaAtiva(key)}
                     className={`inline-flex items-center gap-1.5 px-4 py-3 text-sm font-medium transition-colors active:scale-[0.98] cursor-pointer ${
                       abaAtiva === key
-                        ? 'text-blue-700 border-b-2 border-blue-600 -mb-px'
+                        ? 'text-orange-700 border-b-2 border-orange-600 -mb-px'
                         : 'text-gray-500 hover:text-gray-800'
                     }`}
                   >
@@ -554,11 +554,11 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                             <div
                               key={n.valor}
                               className={`flex items-start gap-3 px-4 py-3 rounded border transition-colors ${
-                                usada ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-gray-50'
+                                usada ? 'border-orange-200 bg-orange-50' : 'border-gray-200 bg-gray-50'
                               }`}
                             >
                               <div className={`w-8 h-8 rounded flex items-center justify-center text-xs font-bold shrink-0 ${
-                                usada ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
+                                usada ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-500'
                               }`}>
                                 {n.label}
                               </div>
@@ -577,7 +577,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                         {editando && (
                           <button
                             onClick={adicionarEndereco}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 border border-blue-200 rounded hover:bg-blue-50 transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-orange-600 border border-orange-200 rounded hover:bg-orange-50 transition-colors cursor-pointer"
                           >
                             <Plus size={14} />
                             Adicionar endereço
@@ -597,7 +597,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                                   <select
                                     value={end.naturezaServico}
                                     onChange={(e) => atualizarEndereco(idx, 'naturezaServico', e.target.value)}
-                                    className="px-2.5 py-1.5 border border-gray-300 bg-white rounded text-xs font-medium focus:border-blue-500 transition-colors"
+                                    className="px-2.5 py-1.5 border border-gray-300 bg-white rounded text-xs font-medium focus:border-orange-500 transition-colors"
                                   >
                                     {NATUREZAS_SERVICOS.map((n) => (
                                       <option key={n.valor} value={n.valor}>{n.label} — {n.descricao}</option>

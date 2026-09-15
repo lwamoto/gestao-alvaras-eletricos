@@ -19,7 +19,7 @@ const alvaraSchema = new mongoose.Schema(
     tipo: { type: String, required: true, enum: ['CONSUMIDOR', 'PARTICULAR', 'POO'] },
     empreiteira: {
       type: String,
-      enum: ['AVANTI', 'CONSTRUCEL', 'CONTEL', 'ELENG', 'ENERGY', 'ELETROCHESKI', 'JB', 'PROENG', 'FELTRIN'],
+      enum: ['AVANTI', 'CONTREL', 'CONSTRUCEL', 'ELENG', 'ELETROCHESKI', 'ENERGY', 'FELTRIN', 'JB', 'OCLE', 'PROENGE', 'SERPA', 'TDA'],
       required: [function () { return this.tipo === 'PARTICULAR'; }, 'Empreiteira é obrigatória para alvará PARTICULAR'],
     },
     situacao: {
