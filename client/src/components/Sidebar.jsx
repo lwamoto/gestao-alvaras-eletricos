@@ -51,7 +51,7 @@ export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse,
               onClick={onToggleCollapse}
               aria-label={recolhida ? 'Expandir menu' : 'Recolher menu'}
               title={recolhida ? 'Expandir menu' : 'Recolher menu'}
-              className="p-1.5 rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 active:scale-90 transition-all cursor-pointer shrink-0"
+              className="p-1.5 rounded text-copel-cinza-medio hover:text-copel-grafite hover:bg-copel-cinza active:scale-90 transition-all cursor-pointer shrink-0"
             >
               {recolhida ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
             </button>
@@ -72,11 +72,11 @@ export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse,
                       recolhida ? 'justify-center gap-0 px-0' : 'gap-3 pl-3 pr-4'
                     } ${
                       ativo
-                        ? 'bg-orange-50/60 border-orange-600 text-orange-700'
-                        : 'border-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                        ? 'bg-copel-laranja/10 border-copel-laranja text-copel-laranja'
+                        : 'border-transparent text-copel-cinza-medio hover:bg-copel-cinza hover:text-copel-grafite'
                     }`}
                   >
-                    <Icon size={17} className={`shrink-0 ${ativo ? 'text-orange-600' : 'text-gray-400'}`} />
+                    <Icon size={17} className={`shrink-0 ${ativo ? 'text-copel-laranja' : 'text-copel-cinza-medio'}`} />
                     <span
                       className={`whitespace-nowrap overflow-hidden transition-all duration-150 ${
                         recolhida ? 'opacity-0 max-w-0' : 'opacity-100 max-w-[160px]'
@@ -92,14 +92,14 @@ export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse,
 
           {!recolhida && (
             <>
-              <h3 className="mt-8 mb-2 pl-3 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+              <h3 className="mt-8 mb-2 pl-3 text-[10px] font-semibold text-copel-cinza-medio uppercase tracking-wider">
                 Empreiteiras
               </h3>
               <ul>
                 {EMPREITEIRAS.map((emp) => (
                   <li
                     key={emp}
-                    className="pl-3 pr-4 py-1.5 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                    className="pl-3 pr-4 py-1.5 text-xs text-copel-cinza-medio hover:text-copel-grafite transition-colors"
                   >
                     {emp}
                   </li>
@@ -112,15 +112,15 @@ export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse,
         <div className={`border-t border-gray-100 ${recolhida ? 'px-3 py-3 flex flex-col items-center gap-2' : 'px-5 py-4'}`}>
           {!recolhida && (
             <>
-              <p className="text-xs font-medium text-gray-700 truncate">{usuario?.nome}</p>
-              <p className="text-[10px] text-gray-400 mb-2">COPEL Distribuição</p>
+              <p className="text-xs font-medium text-copel-grafite truncate">{usuario?.nome}</p>
+              <p className="text-[10px] text-copel-cinza-medio mb-2">COPEL Distribuição</p>
             </>
           )}
           <button
             onClick={onLogout}
             title="Sair"
             aria-label="Sair"
-            className={`inline-flex items-center gap-1.5 text-gray-400 hover:text-red-600 transition-colors cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 text-copel-cinza-medio hover:text-red-600 transition-colors cursor-pointer ${
               recolhida ? 'p-1.5 rounded hover:bg-red-50' : 'text-xs'
             }`}
           >
@@ -146,7 +146,7 @@ export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse,
         <BrandMark collapsed={false} />
         <button
           onClick={() => setMobileOpen((v) => !v)}
-          className="p-2 text-gray-500 hover:text-gray-700 rounded cursor-pointer active:scale-90 transition-transform"
+          className="p-2 text-copel-cinza-medio hover:text-copel-grafite rounded cursor-pointer active:scale-90 transition-transform"
           aria-label="Abrir menu"
           aria-expanded={mobileOpen}
         >

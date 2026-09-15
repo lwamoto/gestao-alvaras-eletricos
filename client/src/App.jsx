@@ -107,7 +107,7 @@ function AppShell() {
   if (carregando) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-orange-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-copel-laranja border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -124,7 +124,7 @@ function AppShell() {
   const eCadastrar = view === 'cadastrar';
 
   return (
-    <div className={ePesquisar ? 'h-screen overflow-hidden flex flex-col bg-gray-50' : 'min-h-screen'}>
+    <div className={ePesquisar ? 'h-screen overflow-hidden flex flex-col bg-copel-cinza' : 'min-h-screen'}>
       {eCadastrar && (
         <div className="fixed inset-0 -z-10">
           <div

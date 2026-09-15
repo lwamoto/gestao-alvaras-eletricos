@@ -66,7 +66,7 @@ export default function SolicitacaoImpressao({ numeroProjeto }) {
   if (carregando) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-orange-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-copel-laranja border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -86,14 +86,14 @@ export default function SolicitacaoImpressao({ numeroProjeto }) {
   const naturezasUsadas = new Set((alvara.enderecos || []).map((e) => e.naturezaServico));
 
   return (
-    <div className="bg-white min-h-screen text-gray-900">
-      <div className="print:hidden sticky top-0 z-10 flex items-center justify-between px-6 py-3 bg-gray-900 text-white">
+    <div className="bg-white min-h-screen text-copel-grafite">
+      <div className="print:hidden sticky top-0 z-10 flex items-center justify-between px-6 py-3 bg-copel-grafite text-white">
         <span className="text-sm font-medium">
           Solicitação de Alvará — Projeto {alvara.numeroProjeto}
         </span>
         <button
           onClick={() => window.print()}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 rounded text-sm font-medium transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-copel-laranja hover:brightness-90 rounded text-sm font-medium transition-colors cursor-pointer"
         >
           <Printer size={16} />
           Imprimir
@@ -118,7 +118,7 @@ function LabelValor({ label, valor }) {
 function PaginaSolicitacao({ alvara, primeiroEndereco, via, quebrarAntes }) {
   return (
     <div className={`max-w-[190mm] mx-auto px-10 py-10 ${quebrarAntes ? 'break-before-page' : ''}`}>
-      <p className="text-right text-[10px] text-gray-400 mb-2">{via}</p>
+      <p className="text-right text-[10px] text-copel-cinza-medio mb-2">{via}</p>
       <h1 className="text-center text-lg font-bold tracking-wide mb-8">SOLICITAÇÃO DE ALVARÁ</h1>
 
       <p className="text-sm mb-1">
@@ -148,7 +148,7 @@ function PaginaSolicitacao({ alvara, primeiroEndereco, via, quebrarAntes }) {
         Atenciosamente:
       </p>
 
-      <div className="border border-gray-900 p-4 mb-6 space-y-1">
+      <div className="border border-copel-grafite p-4 mb-6 space-y-1">
         <LabelValor label="Razão Social" valor={COPEL_INFO.razaoSocial} />
         <LabelValor label="CNPJ/CPF" valor={COPEL_INFO.cnpj} />
         <div className="flex flex-wrap gap-x-8">
@@ -168,7 +168,7 @@ function PaginaSolicitacao({ alvara, primeiroEndereco, via, quebrarAntes }) {
         </div>
       </div>
 
-      <div className="border border-gray-900 p-4 space-y-1">
+      <div className="border border-copel-grafite p-4 space-y-1">
         <p className="text-sm font-semibold">Local da obra:</p>
         <p className="text-sm">{primeiroEndereco?.localObra || '—'}</p>
         <LabelValor label="Tipo de Pavimento" valor={primeiroEndereco?.pavimento || '—'} />
@@ -185,8 +185,8 @@ function PaginaSolicitacao({ alvara, primeiroEndereco, via, quebrarAntes }) {
   );
 }
 
-const thCls = 'border border-gray-900 px-2 py-1.5 font-semibold';
-const tdCls = 'border border-gray-900 px-2 py-1.5';
+const thCls = 'border border-copel-grafite px-2 py-1.5 font-semibold';
+const tdCls = 'border border-copel-grafite px-2 py-1.5';
 
 function PaginaPlanilha({ alvara, naturezasUsadas }) {
   const enderecos = alvara.enderecos?.length ? alvara.enderecos : [];
@@ -195,7 +195,7 @@ function PaginaPlanilha({ alvara, naturezasUsadas }) {
     <div className="max-w-[190mm] mx-auto px-10 py-10 break-before-page">
       <h1 className="text-center text-base font-bold mb-6">PLANILHA DE ALVARÁ</h1>
 
-      <table className="w-full border-collapse border border-gray-900 text-xs mb-4">
+      <table className="w-full border-collapse border border-copel-grafite text-xs mb-4">
         <tbody>
           <tr>
             <td className={`${thCls} w-1/6`}>CONCESSIONÁRIA</td>
@@ -216,7 +216,7 @@ function PaginaPlanilha({ alvara, naturezasUsadas }) {
       <div className="mb-5 space-y-0.5">
         {NATUREZAS_SERVICOS.map((n) => (
           <p key={n.valor} className="text-xs flex items-center gap-2">
-            <span className="inline-flex items-center justify-center w-4 h-4 border border-gray-900 text-[10px] shrink-0">
+            <span className="inline-flex items-center justify-center w-4 h-4 border border-copel-grafite text-[10px] shrink-0">
               {naturezasUsadas.has(n.valor) ? 'X' : ''}
             </span>
             {n.label}-{n.descricao.toUpperCase()}
@@ -224,7 +224,7 @@ function PaginaPlanilha({ alvara, naturezasUsadas }) {
         ))}
       </div>
 
-      <table className="w-full border-collapse border border-gray-900 text-xs table-fixed">
+      <table className="w-full border-collapse border border-copel-grafite text-xs table-fixed">
         <colgroup>
           <col className="w-[6%]" />
           <col className="w-[19%]" />
@@ -263,7 +263,7 @@ function PaginaPlanilha({ alvara, naturezasUsadas }) {
         </tbody>
       </table>
 
-      <table className="mt-4 border-collapse border border-gray-900 text-xs">
+      <table className="mt-4 border-collapse border border-copel-grafite text-xs">
         <tbody>
           <tr>
             <td className={thCls}>TOTAL DE POSTES:</td>

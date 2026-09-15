@@ -7,7 +7,7 @@ import { corDoTipo, corDoNumero } from '../cores.js';
 const LIMITE = 50;
 
 const COR_TEXTO = {
-  preto: 'text-gray-900',
+  preto: 'text-copel-grafite',
   verde: 'text-green-700',
   vermelho: 'text-red-600',
   roxo: 'text-purple-600',
@@ -20,17 +20,17 @@ const SITUACAO_LABEL = {
 };
 
 const SITUACAO_BADGE = {
-  A_FAZER: 'bg-gray-100 text-gray-600',
+  A_FAZER: 'bg-copel-cinza text-copel-grafite',
   ENVIADO: 'bg-blue-50 text-blue-700',
   RECEBIDO: 'bg-green-50 text-green-700',
 };
 
 const selectCls =
-  'w-full px-2.5 py-1.5 border border-gray-200 bg-white rounded text-sm text-gray-700 focus:border-orange-500 transition-colors';
+  'w-full px-2.5 py-1.5 border border-gray-200 bg-white rounded text-sm text-copel-grafite focus:border-copel-laranja transition-colors';
 
-const filtroLabelCls = 'block mb-1 text-[10px] font-semibold text-gray-500 uppercase tracking-wider';
+const filtroLabelCls = 'block mb-1 text-[10px] font-semibold text-copel-cinza-medio uppercase tracking-wider';
 
-const thCls = 'px-3 py-2 text-[10px] font-semibold text-gray-500 uppercase';
+const thCls = 'px-3 py-2 text-[10px] font-semibold text-copel-cinza-medio uppercase';
 
 function paraInputDate(iso) {
   return new Date(iso).toISOString().slice(0, 10);
@@ -125,26 +125,26 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
     <div className="flex flex-col h-full min-h-0">
       <div className="shrink-0 flex items-center gap-2.5 px-4 sm:px-6 py-3 border-b border-gray-200 bg-white">
         <div className="relative flex-1 max-w-sm">
-          <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-copel-cinza-medio" />
           <input
             type="text"
             placeholder="Buscar por número do projeto..."
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-md placeholder:text-gray-400 focus:border-orange-500 transition-colors"
+            className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-md placeholder:text-copel-cinza-medio focus:border-copel-laranja transition-colors"
           />
         </div>
 
         <div className="relative shrink-0" ref={filtrosRef}>
           <button
             onClick={() => setFiltrosAbertos((v) => !v)}
-            className="relative inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-200 rounded-md text-gray-600 hover:bg-gray-50 active:scale-[0.98] transition-all cursor-pointer"
+            className="relative inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-200 rounded-md text-copel-grafite hover:bg-copel-cinza active:scale-[0.98] transition-all cursor-pointer"
           >
             <SlidersHorizontal size={14} />
             Filtros
-            <ChevronDown size={13} className={`text-gray-400 transition-transform duration-150 ${filtrosAbertos ? 'rotate-180' : ''}`} />
+            <ChevronDown size={13} className={`text-copel-cinza-medio transition-transform duration-150 ${filtrosAbertos ? 'rotate-180' : ''}`} />
             {qtdFiltrosAtivos > 0 && (
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-orange-600 ring-2 ring-white" />
+              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-copel-laranja ring-2 ring-white" />
             )}
           </button>
 
@@ -195,7 +195,7 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
               {qtdFiltrosAtivos > 0 && (
                 <button
                   onClick={() => setFiltros({ tipo: '', empreiteira: '', situacao: '' })}
-                  className="text-xs text-orange-600 hover:underline self-start cursor-pointer"
+                  className="text-xs text-copel-laranja hover:underline self-start cursor-pointer"
                 >
                   Limpar filtros
                 </button>
@@ -216,13 +216,13 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
           <div className="h-full flex items-center justify-center text-center p-14">
             <div>
               <Inbox size={36} className="mx-auto text-gray-300 mb-3" />
-              <p className="text-gray-500 text-sm">
+              <p className="text-copel-cinza-medio text-sm">
                 {temFiltros ? 'Nenhum alvará encontrado com esses filtros.' : 'Nenhum alvará cadastrado ainda.'}
               </p>
               {temFiltros && (
                 <button
                   onClick={limparFiltros}
-                  className="mt-3 text-sm text-orange-600 hover:underline cursor-pointer"
+                  className="mt-3 text-sm text-copel-laranja hover:underline cursor-pointer"
                 >
                   Limpar filtros
                 </button>
@@ -233,7 +233,7 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="sticky top-0 z-10">
-                <tr className="bg-gray-50 border-b border-gray-200">
+                <tr className="bg-copel-cinza border-b border-gray-200">
                   <th className={`${thCls} text-left`}>Nº Projeto</th>
                   <th className={`${thCls} text-left`}>Tipo</th>
                   <th className={`${thCls} text-left`}>Situação</th>
@@ -249,7 +249,7 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
                       <tr key={i} className="border-b border-gray-100 last:border-0 animate-pulse">
                         {Array.from({ length: 7 }).map((__, j) => (
                           <td key={j} className="px-3 py-2.5">
-                            <div className="h-3 bg-gray-100 rounded" style={{ width: j === 0 ? '70%' : '85%' }} />
+                            <div className="h-3 bg-copel-cinza rounded" style={{ width: j === 0 ? '70%' : '85%' }} />
                           </td>
                         ))}
                       </tr>
@@ -264,7 +264,7 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
                         <tr
                           key={a._id}
                           onClick={() => onAbrirDetalhe(a.numeroProjeto)}
-                          className="border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer transition-colors"
+                          className="border-b border-gray-100 last:border-0 hover:bg-copel-cinza cursor-pointer transition-colors"
                         >
                           <td className="px-3 py-2.5">
                             <span className={`text-sm font-semibold ${COR_TEXTO[corNumero]}`}>
@@ -275,12 +275,12 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
                             <span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded ${
                               corTipo === 'vermelho' ? 'bg-red-50 text-red-700' :
                               corTipo === 'roxo' ? 'bg-purple-50 text-purple-700' :
-                              'bg-gray-100 text-gray-600'
+                              'bg-copel-cinza text-copel-grafite'
                             }`}>
                               {a.tipo}
                             </span>
                             {a.empreiteira && (
-                              <span className="ml-1.5 text-xs text-gray-500">{a.empreiteira}</span>
+                              <span className="ml-1.5 text-xs text-copel-cinza-medio">{a.empreiteira}</span>
                             )}
                           </td>
                           <td className="px-3 py-2.5">
@@ -288,28 +288,28 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
                               {SITUACAO_LABEL[a.situacao]}
                             </span>
                           </td>
-                          <td className="px-3 py-2.5 text-xs text-gray-700 whitespace-nowrap">
+                          <td className="px-3 py-2.5 text-xs text-copel-grafite whitespace-nowrap">
                             {a.responsavel || '—'}
                           </td>
-                          <td className="px-3 py-2.5 text-xs text-gray-700 max-w-[220px] truncate">
+                          <td className="px-3 py-2.5 text-xs text-copel-grafite max-w-[220px] truncate">
                             {primeiroEndereco || '—'}
                             {enderecosExtras > 0 && (
-                              <span className="ml-1.5 text-[11px] text-gray-400">+{enderecosExtras}</span>
+                              <span className="ml-1.5 text-[11px] text-copel-cinza-medio">+{enderecosExtras}</span>
                             )}
                           </td>
                           <td className="px-3 py-2 text-center">
                             <div className="inline-flex items-center gap-1.5">
-                              <Calendar size={13} className="text-gray-400" />
+                              <Calendar size={13} className="text-copel-cinza-medio" />
                               <input
                                 type="date"
                                 value={paraInputDate(a.dataMarcada || a.createdAt)}
                                 onClick={(e) => e.stopPropagation()}
                                 onChange={(e) => handleChangeData(a._id, e.target.value)}
-                                className="border border-gray-300 rounded px-1.5 py-1 text-xs font-medium text-gray-600 focus:border-orange-500 transition-colors"
+                                className="border border-gray-300 rounded px-1.5 py-1 text-xs font-medium text-copel-grafite focus:border-copel-laranja transition-colors"
                               />
                             </div>
                           </td>
-                          <td className="px-3 py-2.5 text-xs text-gray-400 text-center whitespace-nowrap">
+                          <td className="px-3 py-2.5 text-xs text-copel-cinza-medio text-center whitespace-nowrap">
                             {formatarDataCurta(a.createdAt)}
                           </td>
                         </tr>
@@ -323,7 +323,7 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
 
       {!carregando && resultados.length > 0 && (
         <div className="shrink-0 flex items-center justify-between flex-wrap gap-3 px-4 sm:px-6 py-3 border-t border-gray-200 bg-white">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-copel-cinza-medio">
             Mostrando {inicio}–{fim} de {total} alvará{total !== 1 ? 's' : ''}
           </p>
 
@@ -332,7 +332,7 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
               <button
                 onClick={() => setPagina((p) => Math.max(1, p - 1))}
                 disabled={pagina === 1}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-600 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-copel-grafite border border-gray-300 rounded hover:bg-copel-cinza disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
                 <ChevronLeft size={14} />
                 Anterior
@@ -347,8 +347,8 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
                     onClick={() => setPagina(p)}
                     className={`min-w-[28px] px-2 py-1.5 text-xs font-medium rounded transition-colors cursor-pointer ${
                       p === pagina
-                        ? 'bg-orange-50 text-orange-700 border border-orange-200'
-                        : 'text-gray-600 border border-transparent hover:bg-gray-50'
+                        ? 'bg-copel-laranja/10 text-copel-laranja border border-copel-laranja/30'
+                        : 'text-copel-grafite border border-transparent hover:bg-copel-cinza'
                     }`}
                   >
                     {p}
@@ -359,7 +359,7 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
               <button
                 onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
                 disabled={pagina === totalPaginas}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-600 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-copel-grafite border border-gray-300 rounded hover:bg-copel-cinza disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
                 Próxima
                 <ChevronRight size={14} />

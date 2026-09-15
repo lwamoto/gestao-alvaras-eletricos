@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+@theme {
+  --color-copel-laranja: #f58220;
+  --color-copel-grafite: #222222;
+  --color-copel-cinza: #f2f2f2;
+  --color-copel-cinza-medio: #8a8a8a;
+}
+
 :root {
   --ease-fluid: cubic-bezier(0.32, 0.72, 0, 1);
 }
@@ -7,8 +14,8 @@
 body {
   margin: 0;
   font-family: 'Inter Variable', system-ui, -apple-system, sans-serif;
-  background-color: #f9fafb;
-  color: #111827;
+  background-color: #ffffff;
+  color: #222222;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -20,6 +27,11 @@ body {
 
 @keyframes tab-in {
   from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -41,7 +53,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 button:focus-visible {
-  outline: 2px solid #ea580c;
+  outline: 2px solid #f58220;
   outline-offset: 0;
 }
 

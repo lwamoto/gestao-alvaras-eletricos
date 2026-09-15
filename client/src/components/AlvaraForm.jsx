@@ -11,12 +11,12 @@ const vazio = {
 
 const corTag = {
   POO: 'bg-purple-50 text-purple-700 border border-purple-200',
-  CONSUMIDOR: 'bg-gray-100 text-gray-700 border border-gray-200',
+  CONSUMIDOR: 'bg-copel-cinza text-copel-grafite border border-gray-200',
   PARTICULAR: 'bg-red-50 text-red-700 border border-red-200',
 };
 
 const inputCls =
-  'w-full px-3.5 py-2.5 border border-gray-300 bg-white rounded text-sm text-gray-900 placeholder:text-gray-400 focus:border-orange-500 transition-colors';
+  'w-full px-3.5 py-2.5 border border-gray-300 bg-white rounded text-sm text-copel-grafite placeholder:text-copel-cinza-medio focus:border-copel-laranja transition-colors';
 
 export default function AlvaraForm({ onCreate }) {
   const [form, setForm] = useState(vazio);
@@ -50,8 +50,8 @@ export default function AlvaraForm({ onCreate }) {
   return (
     <div>
       <div className="pb-6 mb-8 border-b border-gray-200">
-        <h1 className="text-xl font-semibold text-gray-900">Cadastrar Alvará</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="text-xl font-semibold text-copel-grafite">Cadastrar Alvará</h1>
+        <p className="mt-1 text-sm text-copel-cinza-medio">
           Preencha os dados abaixo para criar um novo registro.
         </p>
       </div>
@@ -60,7 +60,7 @@ export default function AlvaraForm({ onCreate }) {
         <form onSubmit={handleSubmit} className="p-6 sm:p-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label className="block mb-1.5 text-xs font-medium text-gray-600">
+              <label className="block mb-1.5 text-xs font-medium text-copel-cinza-medio">
                 Número do projeto
               </label>
               <input
@@ -74,7 +74,7 @@ export default function AlvaraForm({ onCreate }) {
             </div>
 
             <div>
-              <label className="block mb-1.5 text-xs font-medium text-gray-600">Modelo</label>
+              <label className="block mb-1.5 text-xs font-medium text-copel-cinza-medio">Modelo</label>
               <div className="relative">
                 <button
                   type="button"
@@ -86,11 +86,11 @@ export default function AlvaraForm({ onCreate }) {
                       {form.tipo}
                     </span>
                   ) : (
-                    <span className="text-gray-400">Selecione o modelo</span>
+                    <span className="text-copel-cinza-medio">Selecione o modelo</span>
                   )}
                   <ChevronDown
                     size={16}
-                    className={`text-gray-400 transition-transform duration-200 ease-[var(--ease-fluid)] ${tipoAberto ? 'rotate-180' : ''}`}
+                    className={`text-copel-cinza-medio transition-transform duration-200 ease-[var(--ease-fluid)] ${tipoAberto ? 'rotate-180' : ''}`}
                   />
                 </button>
 
@@ -103,19 +103,19 @@ export default function AlvaraForm({ onCreate }) {
                         key={t.valor}
                         type="button"
                         onClick={() => escolherTipo(t.valor)}
-                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer ${
+                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm hover:bg-copel-cinza active:bg-copel-cinza transition-colors cursor-pointer ${
                           form.tipo === t.valor ? 'font-medium' : ''
                         }`}
                       >
                         <span className={`inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded ${corTag[t.valor]}`}>
                           {t.valor}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-copel-cinza-medio">
                           {t.valor === 'CONSUMIDOR' && 'Cliente direto'}
                           {t.valor === 'PARTICULAR' && 'Via empreiteira'}
                           {t.valor === 'POO' && 'Tipo raro, sem empreiteira'}
                         </span>
-                        {form.tipo === t.valor && <Check size={15} className="text-orange-600 ml-auto" />}
+                        {form.tipo === t.valor && <Check size={15} className="text-copel-laranja ml-auto" />}
                       </button>
                     ))}
                   </div>
@@ -125,7 +125,7 @@ export default function AlvaraForm({ onCreate }) {
 
             {form.tipo === 'PARTICULAR' && (
               <div>
-                <label className="block mb-1.5 text-xs font-medium text-gray-600">Empreiteira</label>
+                <label className="block mb-1.5 text-xs font-medium text-copel-cinza-medio">Empreiteira</label>
                 <select
                   value={form.empreiteira}
                   onChange={(e) => setForm({ ...form, empreiteira: e.target.value })}
@@ -141,8 +141,8 @@ export default function AlvaraForm({ onCreate }) {
             )}
 
             <div className="sm:col-span-2">
-              <label className="block mb-1.5 text-xs font-medium text-gray-600">
-                Responsável <span className="text-gray-400 font-normal">(opcional)</span>
+              <label className="block mb-1.5 text-xs font-medium text-copel-cinza-medio">
+                Responsável <span className="text-copel-cinza-medio font-normal">(opcional)</span>
               </label>
               <input
                 type="text"
@@ -172,7 +172,7 @@ export default function AlvaraForm({ onCreate }) {
             <button
               type="submit"
               disabled={enviando || !form.tipo}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-600 text-white text-sm font-medium rounded hover:bg-orange-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-copel-laranja text-white text-sm font-medium rounded hover:brightness-90 disabled:bg-gray-200 disabled:text-copel-cinza-medio disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
               <FilePlus size={16} />
               {enviando ? 'Salvando...' : 'Adicionar Alvará'}
