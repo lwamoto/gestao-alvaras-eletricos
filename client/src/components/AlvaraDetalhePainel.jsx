@@ -9,18 +9,27 @@ import {
   Check,
   AlertCircle,
   Printer,
+  Bell,
 } from 'lucide-react';
 import { getAlvaraPorProjeto, updateAlvara, deleteAlvara } from '../api.js';
 import { corDoTipo, corDoNumero } from '../cores.js';
 import { NATUREZAS_SERVICOS } from '../constants.js';
 import { useAuth } from '../contexts/AuthContext.jsx';
 
-const SITUACOES = ['A_FAZER', 'ENVIADO', 'RECEBIDO'];
+const SITUACOES = ['A_FAZER', 'ENVIADO', 'RECEBIDO', 'NAO_NECESSARIO'];
 
 const SITUACAO_BADGE = {
   A_FAZER: 'bg-copel-cinza text-copel-grafite',
   ENVIADO: 'bg-blue-50 text-blue-700',
   RECEBIDO: 'bg-green-50 text-green-700',
+  NAO_NECESSARIO: 'bg-teal-50 text-teal-700',
+};
+
+const SITUACAO_LABEL = {
+  A_FAZER: 'A FAZER',
+  ENVIADO: 'ENVIADO',
+  RECEBIDO: 'RECEBIDO',
+  NAO_NECESSARIO: 'NÃO NECESSÁRIO',
 };
 
 const COR_TEXTO = {
@@ -114,7 +123,9 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
   const [salvando, setSalvando] = useState(false);
   const [sucesso, setSucesso] = useState(false);
   const [form, setForm] = useState(null);
-  const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
+  // null | 'excluir' | 'notificar' — só um desses modais por vez, então
+  // compartilham a mesma máquina de entrada/saída (modalMounted/Entered).
+  const [modalTipo, setModalTipo] = useState(null);
   const [modalMounted, setModalMounted] = useState(false);
   const [modalEntered, setModalEntered] = useState(false);
 
@@ -143,11 +154,11 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
     function aoTeclar(e) {
       // O modal de exclusão tem seu próprio listener de Esc — se ele estiver
       // aberto, o Esc fecha só ele (camada de cima primeiro), não o painel junto.
-      if (e.key === 'Escape' && !confirmandoExclusao) onFechar();
+      if (e.key === 'Escape' && !modalTipo) onFechar();
     }
     document.addEventListener('keydown', aoTeclar);
     return () => document.removeEventListener('keydown', aoTeclar);
-  }, [numeroProjeto, onFechar, confirmandoExclusao]);
+  }, [numeroProjeto, onFechar, modalTipo]);
 
   useEffect(() => {
     if (!numeroProjetoExibido) return;
@@ -167,7 +178,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
   }, [numeroProjetoExibido, abrirToken]);
 
   useEffect(() => {
-    if (confirmandoExclusao) {
+    if (modalTipo) {
       setModalMounted(true);
       const raf = requestAnimationFrame(() => setModalEntered(true));
       return () => cancelAnimationFrame(raf);
@@ -175,16 +186,16 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
     setModalEntered(false);
     const timer = setTimeout(() => setModalMounted(false), 160);
     return () => clearTimeout(timer);
-  }, [confirmandoExclusao]);
+  }, [modalTipo]);
 
   useEffect(() => {
-    if (!confirmandoExclusao) return;
+    if (!modalTipo) return;
     function aoTeclar(e) {
-      if (e.key === 'Escape') setConfirmandoExclusao(false);
+      if (e.key === 'Escape') setModalTipo(null);
     }
     document.addEventListener('keydown', aoTeclar);
     return () => document.removeEventListener('keydown', aoTeclar);
-  }, [confirmandoExclusao]);
+  }, [modalTipo]);
 
   function iniciarArraste(e) {
     arrastandoRef.current = { startX: e.clientX, startWidth: largura, larguraAtual: largura };
@@ -219,7 +230,20 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
     setEditando(false);
   }
 
-  async function handleSalvar() {
+  function handleSalvarClick() {
+    // Só oferece notificar quando a mudança é justamente ENVIADO -> RECEBIDO
+    // e existe alguém pra notificar (alvará PARTICULAR com empreiteira).
+    const indoParaRecebido =
+      alvara.situacao === 'ENVIADO' && form.situacao === 'RECEBIDO' && !!alvara.empreiteira;
+    if (indoParaRecebido) {
+      setModalTipo('notificar');
+      return;
+    }
+    salvar(false);
+  }
+
+  async function salvar(notificar) {
+    setModalTipo(null);
     setSalvando(true);
     setErro('');
     try {
@@ -241,6 +265,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
         enderecos: enderecosPayload,
         qtdPostes: parseFloatSafe(form.totalPostes),
         qtdCaboM: parseFloatSafe(form.totalCaboM),
+        notificar,
       };
 
       if (form.numeroProjeto !== alvara.numeroProjeto) {
@@ -270,17 +295,17 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
   }
 
   function handleExcluir() {
-    setConfirmandoExclusao(true);
+    setModalTipo('excluir');
   }
 
   async function confirmarExclusao() {
     try {
       await deleteAlvara(alvara._id);
-      setConfirmandoExclusao(false);
+      setModalTipo(null);
       onFechar();
     } catch (err) {
       setErro(err.message);
-      setConfirmandoExclusao(false);
+      setModalTipo(null);
     }
   }
 
@@ -370,7 +395,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                   Projeto {alvara.numeroProjeto}
                 </h1>
                 <span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded shrink-0 ${SITUACAO_BADGE[alvara.situacao]}`}>
-                  {alvara.situacao.replace('_', ' ')}
+                  {SITUACAO_LABEL[alvara.situacao]}
                 </span>
                 <span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded shrink-0 ${
                   corTipo === 'vermelho' ? 'bg-red-50 text-red-700' :
@@ -407,15 +432,15 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                         <Trash2 size={13} />
                         Excluir
                       </button>
+                      <button
+                        onClick={() => window.open(`/?imprimir=${encodeURIComponent(alvara.numeroProjeto)}`, '_blank')}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-gray-300 text-copel-grafite text-xs font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"
+                      >
+                        <Printer size={13} />
+                        Imprimir
+                      </button>
                     </>
                   )}
-                  <button
-                    onClick={() => window.open(`/?imprimir=${encodeURIComponent(alvara.numeroProjeto)}`, '_blank')}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-gray-300 text-copel-grafite text-xs font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"
-                  >
-                    <Printer size={13} />
-                    Imprimir
-                  </button>
                 </>
               ) : (
                 <>
@@ -427,7 +452,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                     Cancelar
                   </button>
                   <button
-                    onClick={handleSalvar}
+                    onClick={handleSalvarClick}
                     disabled={salvando}
                     className="px-3.5 py-1.5 bg-copel-laranja text-white text-xs font-medium rounded hover:brightness-90 disabled:bg-gray-200 disabled:text-copel-cinza-medio active:scale-[0.97] transition-all cursor-pointer"
                   >
@@ -523,12 +548,12 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                           className={`${inputCls} w-48`}
                         >
                           {SITUACOES.map((s) => (
-                            <option key={s} value={s}>{s.replace('_', ' ')}</option>
+                            <option key={s} value={s}>{SITUACAO_LABEL[s]}</option>
                           ))}
                         </select>
                       ) : (
                         <span className={`inline-flex items-center px-2.5 py-1 text-xs font-medium rounded ${SITUACAO_BADGE[alvara.situacao]}`}>
-                          {alvara.situacao.replace('_', ' ')}
+                          {SITUACAO_LABEL[alvara.situacao]}
                         </span>
                       )}
                     </LinhaCampo>
@@ -817,42 +842,76 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
           className={`fixed inset-0 z-50 flex items-center justify-center px-4 bg-copel-grafite/40 backdrop-blur-[2px] transition-opacity ease-[var(--ease-fluid)] ${
             modalEntered ? 'opacity-100 duration-[180ms]' : 'opacity-0 duration-[140ms]'
           }`}
-          onClick={() => setConfirmandoExclusao(false)}
+          onClick={() => setModalTipo(null)}
         >
           <div
             role="dialog"
             aria-modal="true"
-            aria-labelledby="titulo-confirmar-exclusao"
+            aria-labelledby="titulo-modal-painel"
             className={`bg-white rounded-lg shadow-xl max-w-sm w-full p-6 origin-center transition-[transform,opacity] ease-[var(--ease-fluid)] ${
               modalEntered ? 'opacity-100 scale-100 duration-[220ms]' : 'opacity-0 scale-95 duration-[140ms]'
             }`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center shrink-0">
-                <AlertCircle size={20} />
-              </div>
-              <div>
-                <h2 id="titulo-confirmar-exclusao" className="text-sm font-semibold text-copel-grafite">
-                  Excluir projeto {alvara?.numeroProjeto}?
-                </h2>
-                <p className="mt-1 text-sm text-copel-cinza-medio">Essa ação não pode ser desfeita.</p>
-              </div>
-            </div>
-            <div className="mt-6 flex justify-end gap-2">
-              <button
-                onClick={() => setConfirmandoExclusao(false)}
-                className="px-4 py-2 bg-white border border-gray-300 text-copel-grafite text-sm font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmarExclusao}
-                className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 active:scale-[0.97] transition-all cursor-pointer"
-              >
-                Excluir
-              </button>
-            </div>
+            {modalTipo === 'excluir' ? (
+              <>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center shrink-0">
+                    <AlertCircle size={20} />
+                  </div>
+                  <div>
+                    <h2 id="titulo-modal-painel" className="text-sm font-semibold text-copel-grafite">
+                      Excluir projeto {alvara?.numeroProjeto}?
+                    </h2>
+                    <p className="mt-1 text-sm text-copel-cinza-medio">Essa ação não pode ser desfeita.</p>
+                  </div>
+                </div>
+                <div className="mt-6 flex justify-end gap-2">
+                  <button
+                    onClick={() => setModalTipo(null)}
+                    className="px-4 py-2 bg-white border border-gray-300 text-copel-grafite text-sm font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={confirmarExclusao}
+                    className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 active:scale-[0.97] transition-all cursor-pointer"
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-copel-laranja/10 text-copel-laranja flex items-center justify-center shrink-0">
+                    <Bell size={20} />
+                  </div>
+                  <div>
+                    <h2 id="titulo-modal-painel" className="text-sm font-semibold text-copel-grafite">
+                      Deseja notificar a empreiteira?
+                    </h2>
+                    <p className="mt-1 text-sm text-copel-cinza-medio">
+                      A {alvara?.empreiteira} vai receber um aviso de que o projeto {alvara?.numeroProjeto} foi recebido.
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-6 flex justify-end gap-2">
+                  <button
+                    onClick={() => salvar(false)}
+                    className="px-4 py-2 bg-white border border-gray-300 text-copel-grafite text-sm font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"
+                  >
+                    Não
+                  </button>
+                  <button
+                    onClick={() => salvar(true)}
+                    className="px-4 py-2 bg-copel-laranja text-white text-sm font-medium rounded hover:brightness-90 active:scale-[0.97] transition-all cursor-pointer"
+                  >
+                    Sim, notificar
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

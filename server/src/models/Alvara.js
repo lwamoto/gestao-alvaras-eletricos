@@ -29,7 +29,7 @@ const alvaraSchema = new mongoose.Schema(
     situacao: {
       type: String,
       required: true,
-      enum: ['A_FAZER', 'ENVIADO', 'RECEBIDO'],
+      enum: ['A_FAZER', 'ENVIADO', 'RECEBIDO', 'NAO_NECESSARIO'],
       default: 'A_FAZER',
     },
     dataMarcada: { type: Date, default: Date.now },

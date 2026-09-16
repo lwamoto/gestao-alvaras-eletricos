@@ -18,12 +18,14 @@ const SITUACAO_LABEL = {
   A_FAZER: 'A FAZER',
   ENVIADO: 'ENVIADO',
   RECEBIDO: 'RECEBIDO',
+  NAO_NECESSARIO: 'NÃO NECESSÁRIO',
 };
 
 const SITUACAO_BADGE = {
   A_FAZER: 'bg-copel-cinza text-copel-grafite',
   ENVIADO: 'bg-blue-50 text-blue-700',
   RECEBIDO: 'bg-green-50 text-green-700',
+  NAO_NECESSARIO: 'bg-teal-50 text-teal-700',
 };
 
 const selectCls =
@@ -195,7 +197,13 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
                   <option value="A_FAZER">A fazer</option>
                   <option value="ENVIADO">Enviado</option>
                   <option value="RECEBIDO">Recebido</option>
+                  <option value="NAO_NECESSARIO">Não necessário</option>
                 </select>
+                {!filtros.situacao && (
+                  <p className="mt-1 text-[10px] text-copel-cinza-medio">
+                    Alvarás "Não necessário" só aparecem com esse filtro selecionado.
+                  </p>
+                )}
               </div>
 
               {qtdFiltrosAtivos > 0 && (
@@ -270,7 +278,11 @@ export default function PesquisarAlvara({ onAbrirDetalhe, refreshKey }) {
                         <tr
                           key={a._id}
                           onClick={() => onAbrirDetalhe(a.numeroProjeto)}
-                          className="border-b border-gray-100 last:border-0 hover:bg-copel-cinza cursor-pointer transition-colors"
+                          className={`border-b border-gray-100 last:border-0 cursor-pointer transition-colors ${
+                            a.situacao === 'NAO_NECESSARIO'
+                              ? 'bg-teal-50/60 hover:bg-teal-50'
+                              : 'hover:bg-copel-cinza'
+                          }`}
                         >
                           <td className="px-3 py-2.5">
                             <span className={`text-sm font-semibold ${COR_TEXTO[corNumero]}`}>

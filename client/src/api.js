@@ -49,3 +49,7 @@ export async function updateAlvara(id, alteracoes) {
 export async function deleteAlvara(id) {
   return request(`${API_URL}/${id}`, { method: 'DELETE' }, 'Falha ao excluir alvará');
 }
+
+export async function getEstatisticas() {
+  return request(`${API_URL}/estatisticas`, {}, 'Falha ao buscar estatísticas');
+}

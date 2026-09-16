@@ -7,11 +7,12 @@ import Login from './components/Login.jsx';
 import SolicitacaoImpressao from './components/SolicitacaoImpressao.jsx';
 import UsuariosAdmin from './components/UsuariosAdmin.jsx';
 import EmpreiteirasAdmin from './components/EmpreiteirasAdmin.jsx';
+import Dashboard from './components/Dashboard.jsx';
 import { createAlvara } from './api.js';
 import { FUNDOS_CADASTRO, indiceFundoAtual } from './fundoCadastro.js';
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 
-const VIEWS_VALIDAS = ['cadastrar', 'pesquisar', 'usuarios', 'empreiteiras'];
+const VIEWS_VALIDAS = ['dashboard', 'cadastrar', 'pesquisar', 'usuarios', 'empreiteiras'];
 
 function lerEstadoUrl() {
   const params = new URLSearchParams(window.location.search);
@@ -74,7 +75,9 @@ function AppShell() {
   }
 
   const abrirDetalhe = useCallback((numeroProjeto) => {
-    setEstado((prev) => ({ ...prev, projetoAberto: numeroProjeto }));
+    // Também troca `view` aqui (não só na URL) — necessário pra quem chama
+    // isso estando em outra tela, como o sino de notificações no dashboard.
+    setEstado((prev) => ({ ...prev, projetoAberto: numeroProjeto, view: 'pesquisar' }));
     const params = new URLSearchParams(window.location.search);
     params.set('projeto', numeroProjeto);
     params.set('view', 'pesquisar');
@@ -121,13 +124,15 @@ function AppShell() {
     return <Login />;
   }
 
-  if (imprimirProjeto) {
+  // Impressão é exclusiva de usuário COPEL — empreiteira não pode gerar o
+  // documento, nem digitando a URL direto (mesma regra já vale no botão).
+  if (imprimirProjeto && usuario.tipo === 'COPEL') {
     return <SolicitacaoImpressao numeroProjeto={imprimirProjeto} />;
   }
 
   // Usuário EMPREITEIRA só enxerga a pesquisa (só leitura, escopada à própria
   // empreiteira no backend) — qualquer outra view cai pra pesquisar.
-  const viewsPermitidas = usuario.tipo === 'EMPREITEIRA' ? ['pesquisar'] : VIEWS_VALIDAS;
+  const viewsPermitidas = usuario.tipo === 'EMPREITEIRA' ? ['dashboard', 'pesquisar'] : VIEWS_VALIDAS;
   const viewEfetiva = viewsPermitidas.includes(view) ? view : 'pesquisar';
 
   const ePesquisar = viewEfetiva === 'pesquisar';
@@ -152,12 +157,18 @@ function AppShell() {
         onToggleCollapse={alternarSidebar}
         usuario={usuario}
         onLogout={logout}
+        onAbrirProjeto={abrirDetalhe}
       />
       <main
         className={`transition-[padding-left] duration-200 ${sidebarRecolhida ? 'lg:pl-16' : 'lg:pl-64'} ${
           ePesquisar ? 'flex-1 min-h-0 flex flex-col' : ''
         }`}
       >
+        {viewEfetiva === 'dashboard' && (
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <Dashboard usuario={usuario} />
+          </div>
+        )}
         {viewEfetiva === 'cadastrar' && (
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <AlvaraForm onCreate={handleCreate} />

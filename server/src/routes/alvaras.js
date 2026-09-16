@@ -2,6 +2,7 @@ import { Router } from 'express';
 import Alvara from '../models/Alvara.js';
 import HistoricoAlvara from '../models/HistoricoAlvara.js';
 import Empreiteira from '../models/Empreiteira.js';
+import Notificacao from '../models/Notificacao.js';
 import { requireCopel } from '../middleware/auth.js';
 
 const router = Router();
@@ -22,10 +23,56 @@ async function validarEmpreiteira(nome) {
   return !!existe;
 }
 
+router.get('/estatisticas', async (req, res) => {
+  const filtro = aplicarEscopo({}, req.usuario);
+  // $and (não spread) — spread sobrescreveria `empreiteira`/`responsavel` do
+  // escopo se a chave colidisse, vazando dado de fora do escopo do usuário.
+  const matchResponsavel = { $and: [filtro, { responsavel: { $nin: ['', null] } }] };
+  const matchEmpreiteira = { $and: [filtro, { empreiteira: { $nin: ['', null] } }] };
+
+  const [porSituacaoAgg, porResponsavelAgg, porEmpreiteiraAgg, total] = await Promise.all([
+    Alvara.aggregate([
+      { $match: filtro },
+      { $group: { _id: '$situacao', total: { $sum: 1 } } },
+    ]),
+    Alvara.aggregate([
+      { $match: matchResponsavel },
+      { $group: { _id: '$responsavel', total: { $sum: 1 } } },
+      { $sort: { total: -1 } },
+      { $limit: 8 },
+    ]),
+    Alvara.aggregate([
+      { $match: matchEmpreiteira },
+      { $group: { _id: '$empreiteira', total: { $sum: 1 } } },
+      { $sort: { total: -1 } },
+      { $limit: 8 },
+    ]),
+    Alvara.countDocuments(filtro),
+  ]);
+
+  const porSituacao = { A_FAZER: 0, ENVIADO: 0, RECEBIDO: 0, NAO_NECESSARIO: 0 };
+  for (const item of porSituacaoAgg) {
+    if (item._id in porSituacao) porSituacao[item._id] = item.total;
+  }
+
+  res.json({
+    total,
+    porSituacao,
+    porResponsavel: porResponsavelAgg.map((r) => ({ nome: r._id, total: r.total })),
+    porEmpreiteira: porEmpreiteiraAgg.map((r) => ({ nome: r._id, total: r.total })),
+  });
+});
+
 router.get('/', async (req, res) => {
   let filtro = {};
   if (req.query.tipo) filtro.tipo = req.query.tipo;
-  if (req.query.situacao) filtro.situacao = req.query.situacao;
+  if (req.query.situacao) {
+    filtro.situacao = req.query.situacao;
+  } else {
+    // Alvará "não necessário" só aparece quando alguém filtra por ele —
+    // fora isso, some da pesquisa normal (ver ponto 5 do roadmap).
+    filtro.situacao = { $ne: 'NAO_NECESSARIO' };
+  }
   if (req.query.busca) filtro.numeroProjeto = { $regex: req.query.busca, $options: 'i' };
   if (req.query.empreiteira) filtro.empreiteira = req.query.empreiteira;
   filtro = aplicarEscopo(filtro, req.usuario);
@@ -152,6 +199,22 @@ router.patch('/:id', requireCopel, async (req, res) => {
         });
       } catch (histErr) {
         console.error('Falha ao gravar histórico (editado):', histErr.message);
+      }
+    }
+
+    // Notificação é opt-in por edição — o front pergunta "deseja notificar?"
+    // ao mudar pra RECEBIDO e manda `notificar` junto só se a resposta foi sim.
+    if (req.body.notificar && diff.situacao?.para === 'RECEBIDO' && alvara.empreiteira) {
+      try {
+        await Notificacao.create({
+          empreiteira: alvara.empreiteira,
+          alvaraId: alvara._id,
+          numeroProjeto: alvara.numeroProjeto,
+          mensagem: `Projeto ${alvara.numeroProjeto} foi RECEBIDO`,
+          criadoPor: req.usuario.nome,
+        });
+      } catch (notifErr) {
+        console.error('Falha ao criar notificação:', notifErr.message);
       }
     }
 

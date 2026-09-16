@@ -7,6 +7,7 @@ import alvarasRouter from './routes/alvaras.js';
 import authRouter from './routes/auth.js';
 import usuariosRouter from './routes/usuarios.js';
 import empreiteirasRouter from './routes/empreiteiras.js';
+import notificacoesRouter from './routes/notificacoes.js';
 import { requireAuth } from './middleware/auth.js';
 
 const app = express();
@@ -18,6 +19,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/alvaras', requireAuth, alvarasRouter);
 app.use('/api/usuarios', requireAuth, usuariosRouter);
 app.use('/api/empreiteiras', requireAuth, empreiteirasRouter);
+app.use('/api/notificacoes', requireAuth, notificacoesRouter);
 
 const PORT = process.env.PORT || 4000;
 

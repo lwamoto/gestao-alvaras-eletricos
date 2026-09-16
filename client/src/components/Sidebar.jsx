@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import { FilePlus, Search, Menu, PanelLeftClose, PanelLeftOpen, LogOut, Users, Building2 } from 'lucide-react';
+import { FilePlus, Search, Menu, PanelLeftClose, PanelLeftOpen, LogOut, Users, Building2, LayoutDashboard } from 'lucide-react';
 import BrandMark from './BrandMark.jsx';
+import NotificacoesSino from './NotificacoesSino.jsx';
 
 const NAV_ITEMS_COPEL = [
+  { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { key: 'cadastrar', label: 'Cadastrar Alvará', icon: FilePlus },
   { key: 'pesquisar', label: 'Pesquisar Alvará', icon: Search },
   { key: 'usuarios', label: 'Usuários', icon: Users },
@@ -10,10 +12,11 @@ const NAV_ITEMS_COPEL = [
 ];
 
 const NAV_ITEMS_EMPREITEIRA = [
+  { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { key: 'pesquisar', label: 'Meus Alvarás', icon: Search },
 ];
 
-export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse, usuario, onLogout }) {
+export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse, usuario, onLogout, onAbrirProjeto }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [drawerMounted, setDrawerMounted] = useState(false);
   const [drawerEntered, setDrawerEntered] = useState(false);
@@ -52,16 +55,19 @@ export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse,
           }`}
         >
           <BrandMark collapsed={recolhida} />
-          {onToggleCollapse && (
-            <button
-              onClick={onToggleCollapse}
-              aria-label={recolhida ? 'Expandir menu' : 'Recolher menu'}
-              title={recolhida ? 'Expandir menu' : 'Recolher menu'}
-              className="p-1.5 rounded text-copel-cinza-medio hover:text-copel-grafite hover:bg-copel-cinza active:scale-90 transition-all cursor-pointer shrink-0"
-            >
-              {recolhida ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
-            </button>
-          )}
+          <div className={`flex items-center ${recolhida ? 'flex-col gap-2' : 'gap-1 shrink-0'}`}>
+            {usuario?.tipo === 'EMPREITEIRA' && <NotificacoesSino onAbrirProjeto={onAbrirProjeto} />}
+            {onToggleCollapse && (
+              <button
+                onClick={onToggleCollapse}
+                aria-label={recolhida ? 'Expandir menu' : 'Recolher menu'}
+                title={recolhida ? 'Expandir menu' : 'Recolher menu'}
+                className="p-1.5 rounded text-copel-cinza-medio hover:text-copel-grafite hover:bg-copel-cinza active:scale-90 transition-all cursor-pointer shrink-0"
+              >
+                {recolhida ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+              </button>
+            )}
+          </div>
         </div>
 
         <nav className="flex-1 px-3 pb-4">
@@ -134,14 +140,17 @@ export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse,
 
       <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 sticky top-0 z-50">
         <BrandMark collapsed={false} />
-        <button
-          onClick={() => setMobileOpen((v) => !v)}
-          className="p-2 text-copel-cinza-medio hover:text-copel-grafite rounded cursor-pointer active:scale-90 transition-transform"
-          aria-label="Abrir menu"
-          aria-expanded={mobileOpen}
-        >
-          <Menu size={20} />
-        </button>
+        <div className="flex items-center gap-1">
+          {usuario?.tipo === 'EMPREITEIRA' && <NotificacoesSino onAbrirProjeto={onAbrirProjeto} />}
+          <button
+            onClick={() => setMobileOpen((v) => !v)}
+            className="p-2 text-copel-cinza-medio hover:text-copel-grafite rounded cursor-pointer active:scale-90 transition-transform"
+            aria-label="Abrir menu"
+            aria-expanded={mobileOpen}
+          >
+            <Menu size={20} />
+          </button>
+        </div>
       </header>
 
       {drawerMounted && (
