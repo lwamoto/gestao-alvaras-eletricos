@@ -14,15 +14,16 @@ import {
 import { getAlvaraPorProjeto, updateAlvara, deleteAlvara } from '../api.js';
 import { corDoTipo, corDoNumero } from '../cores.js';
 import { NATUREZAS_SERVICOS } from '../constants.js';
+import { formatarNumeroPlanilha, calcularLarguraArea } from '../planilha.js';
 import { useAuth } from '../contexts/AuthContext.jsx';
 
 const SITUACOES = ['A_FAZER', 'ENVIADO', 'RECEBIDO', 'NAO_NECESSARIO'];
 
 const SITUACAO_BADGE = {
   A_FAZER: 'bg-copel-cinza text-copel-grafite',
-  ENVIADO: 'bg-blue-50 text-blue-700',
-  RECEBIDO: 'bg-green-50 text-green-700',
-  NAO_NECESSARIO: 'bg-teal-50 text-teal-700',
+  ENVIADO: 'bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400',
+  RECEBIDO: 'bg-green-50 dark:bg-green-500/15 text-green-700 dark:text-green-400',
+  NAO_NECESSARIO: 'bg-teal-50 dark:bg-teal-500/15 text-teal-700 dark:text-teal-400',
 };
 
 const SITUACAO_LABEL = {
@@ -40,10 +41,10 @@ const COR_TEXTO = {
 };
 
 const inputCls =
-  'px-3 py-2 border border-gray-300 bg-white rounded text-sm text-copel-grafite placeholder:text-copel-cinza-medio focus:border-copel-laranja transition-colors';
+  'px-3 py-2 border border-gray-300 dark:border-white/15 bg-white dark:bg-[#20232a] rounded text-sm text-copel-grafite placeholder:text-copel-cinza-medio focus:border-copel-laranja transition-colors';
 
 const inputNumCls =
-  'px-3 py-2 border border-gray-300 bg-white rounded text-sm text-copel-grafite placeholder:text-copel-cinza-medio focus:border-copel-laranja transition-colors w-full';
+  'px-3 py-2 border border-gray-300 dark:border-white/15 bg-white dark:bg-[#20232a] rounded text-sm text-copel-grafite placeholder:text-copel-cinza-medio focus:border-copel-laranja transition-colors w-full';
 
 const LARGURA_MIN = 420;
 const LARGURA_MAX = 1100;
@@ -69,15 +70,16 @@ function parseFloatSafe(v) {
 }
 
 function novoEnderecoVazio() {
+  const { larguraM, areaM2 } = calcularLarguraArea('5', '');
   return {
     naturezaServico: '5',
     localObra: '',
     transversal1: '',
     transversal2: '',
     qtdExtensao: '',
-    larguraM: '',
+    larguraM: formatarNumeroPlanilha(larguraM),
     pavimento: '',
-    areaM2: '',
+    areaM2: formatarNumeroPlanilha(areaM2),
     folhaNumero: '',
   };
 }
@@ -88,17 +90,24 @@ function formToState(dados) {
     situacao: dados.situacao,
     responsavel: dados.responsavel || '',
     enderecos: dados.enderecos && dados.enderecos.length > 0
-      ? dados.enderecos.map((e) => ({
-          naturezaServico: e.naturezaServico || '5',
-          localObra: e.localObra || '',
-          transversal1: e.transversal1 || '',
-          transversal2: e.transversal2 || '',
-          qtdExtensao: e.qtdExtensao !== undefined && e.qtdExtensao !== 0 ? String(e.qtdExtensao) : '',
-          larguraM: e.larguraM !== undefined && e.larguraM !== 0 ? String(e.larguraM) : '',
-          pavimento: e.pavimento || '',
-          areaM2: e.areaM2 !== undefined && e.areaM2 !== 0 ? String(e.areaM2) : '',
-          folhaNumero: e.folhaNumero || '',
-        }))
+      ? dados.enderecos.map((e) => {
+          const naturezaServico = e.naturezaServico || '5';
+          const qtdExtensao = e.qtdExtensao !== undefined && e.qtdExtensao !== 0 ? String(e.qtdExtensao) : '';
+          // Normaliza largura/área pra regra fixa mesmo em endereços antigos,
+          // que podem ter sido salvos antes dessa regra existir.
+          const { larguraM, areaM2 } = calcularLarguraArea(naturezaServico, qtdExtensao);
+          return {
+            naturezaServico,
+            localObra: e.localObra || '',
+            transversal1: e.transversal1 || '',
+            transversal2: e.transversal2 || '',
+            qtdExtensao,
+            larguraM: formatarNumeroPlanilha(larguraM),
+            pavimento: e.pavimento || '',
+            areaM2: formatarNumeroPlanilha(areaM2),
+            folhaNumero: e.folhaNumero || '',
+          };
+        })
       : [novoEnderecoVazio()],
     totalPostes: dados.qtdPostes ? String(dados.qtdPostes) : '',
     totalCaboM: dados.qtdCaboM ? String(dados.qtdCaboM) : '',
@@ -312,7 +321,25 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
   function atualizarEndereco(idx, campo, valor) {
     setForm((prev) => {
       const enderecos = [...prev.enderecos];
-      enderecos[idx] = { ...enderecos[idx], [campo]: valor };
+      const atual = { ...enderecos[idx], [campo]: valor };
+      // Largura e área não são digitadas — recalculadas a cada mudança de
+      // natureza/extensão, seguindo a regra fixa da Planilha de Alvará.
+      if (campo === 'naturezaServico' || campo === 'qtdExtensao') {
+        const { larguraM, areaM2 } = calcularLarguraArea(atual.naturezaServico, atual.qtdExtensao);
+        atual.larguraM = formatarNumeroPlanilha(larguraM);
+        atual.areaM2 = formatarNumeroPlanilha(areaM2);
+      }
+      enderecos[idx] = atual;
+      return { ...prev, enderecos };
+    });
+  }
+
+  function formatarQtdExtensaoAoSair(idx) {
+    setForm((prev) => {
+      const atual = prev.enderecos[idx];
+      if (atual.qtdExtensao === '') return prev;
+      const enderecos = [...prev.enderecos];
+      enderecos[idx] = { ...atual, qtdExtensao: formatarNumeroPlanilha(atual.qtdExtensao) };
       return { ...prev, enderecos };
     });
   }
@@ -345,14 +372,14 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
   return (
     <>
       <div
-        className={`fixed inset-0 z-30 bg-copel-grafite/20 transition-opacity ease-[var(--ease-fluid)] ${
+        className={`fixed inset-0 z-30 bg-[#000000]/20 dark:bg-black/50 transition-opacity ease-[var(--ease-fluid)] ${
           painelEntrou ? 'opacity-100 duration-[240ms]' : 'opacity-0 duration-[180ms]'
         }`}
         onClick={onFechar}
       />
 
       <div
-        className={`fixed inset-y-0 right-0 z-40 bg-white border-l border-gray-200 shadow-xl flex flex-col transition-transform ease-[var(--ease-fluid)] ${
+        className={`fixed inset-y-0 right-0 z-40 bg-white dark:bg-[#1a1c22] border-l border-gray-200 dark:border-white/10 shadow-xl flex flex-col transition-transform ease-[var(--ease-fluid)] ${
           painelEntrou ? 'translate-x-0 duration-[280ms]' : 'translate-x-full duration-[200ms]'
         }`}
         style={{ width: largura }}
@@ -389,7 +416,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
           </div>
         ) : (
           <>
-            <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-gray-200 shrink-0">
+            <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-gray-200 dark:border-white/10 shrink-0">
               <div className="flex items-center gap-2 flex-wrap min-w-0">
                 <h1 className={`text-base font-bold truncate ${COR_TEXTO[corNumero]}`}>
                   Projeto {alvara.numeroProjeto}
@@ -398,8 +425,8 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                   {SITUACAO_LABEL[alvara.situacao]}
                 </span>
                 <span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded shrink-0 ${
-                  corTipo === 'vermelho' ? 'bg-red-50 text-red-700' :
-                  corTipo === 'roxo' ? 'bg-purple-50 text-purple-700' :
+                  corTipo === 'vermelho' ? 'bg-red-50 dark:bg-red-500/15 text-red-700 dark:text-red-400' :
+                  corTipo === 'roxo' ? 'bg-purple-50 dark:bg-purple-500/15 text-purple-700 dark:text-purple-400' :
                   'bg-copel-cinza text-copel-grafite'
                 }`}>
                   {alvara.tipo}
@@ -414,7 +441,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
               </button>
             </div>
 
-            <div className="flex items-center gap-2 px-5 py-3 border-b border-gray-100 shrink-0">
+            <div className="flex items-center gap-2 px-5 py-3 border-b border-gray-100 dark:border-white/5 shrink-0">
               {!editando ? (
                 <>
                   {podeEditar && (
@@ -427,14 +454,14 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                       </button>
                       <button
                         onClick={handleExcluir}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-gray-300 text-red-600 text-xs font-medium rounded hover:bg-red-50 active:scale-[0.97] transition-all cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white dark:bg-[#20232a] border border-gray-300 dark:border-white/15 text-red-600 dark:text-red-400 text-xs font-medium rounded hover:bg-red-50 dark:hover:bg-red-500/10 active:scale-[0.97] transition-all cursor-pointer"
                       >
                         <Trash2 size={13} />
                         Excluir
                       </button>
                       <button
                         onClick={() => window.open(`/?imprimir=${encodeURIComponent(alvara.numeroProjeto)}`, '_blank')}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-gray-300 text-copel-grafite text-xs font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white dark:bg-[#20232a] border border-gray-300 dark:border-white/15 text-copel-grafite text-xs font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"
                       >
                         <Printer size={13} />
                         Imprimir
@@ -447,14 +474,14 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                   <button
                     onClick={handleCancelar}
                     disabled={salvando}
-                    className="px-3.5 py-1.5 bg-white border border-gray-300 text-copel-grafite text-xs font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"
+                    className="px-3.5 py-1.5 bg-white dark:bg-[#20232a] border border-gray-300 dark:border-white/15 text-copel-grafite text-xs font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"
                   >
                     Cancelar
                   </button>
                   <button
                     onClick={handleSalvarClick}
                     disabled={salvando}
-                    className="px-3.5 py-1.5 bg-copel-laranja text-white text-xs font-medium rounded hover:brightness-90 disabled:bg-gray-200 disabled:text-copel-cinza-medio active:scale-[0.97] transition-all cursor-pointer"
+                    className="px-3.5 py-1.5 bg-copel-laranja text-white text-xs font-medium rounded hover:brightness-90 disabled:bg-gray-200 dark:disabled:bg-white/10 disabled:text-copel-cinza-medio active:scale-[0.97] transition-all cursor-pointer"
                   >
                     {salvando ? 'Salvando...' : 'Salvar'}
                   </button>
@@ -465,20 +492,20 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
             <div className="flex-1 min-h-0 overflow-y-auto">
               <div className="px-5 pt-4">
                 {sucesso && (
-                  <div className="mb-4 flex items-center gap-2 px-3.5 py-2.5 bg-green-50 border border-green-200 text-green-700 rounded text-sm animate-[pop-in_180ms_var(--ease-fluid)]">
+                  <div className="mb-4 flex items-center gap-2 px-3.5 py-2.5 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-700 dark:text-green-400 rounded text-sm animate-[pop-in_180ms_var(--ease-fluid)]">
                     <Check size={16} />
                     Alterações salvas com sucesso!
                   </div>
                 )}
                 {erro && (
-                  <div className="mb-4 flex items-center gap-2 px-3.5 py-2.5 bg-red-50 border border-red-200 text-red-700 rounded text-sm animate-[pop-in_180ms_var(--ease-fluid)]">
+                  <div className="mb-4 flex items-center gap-2 px-3.5 py-2.5 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-400 rounded text-sm animate-[pop-in_180ms_var(--ease-fluid)]">
                     <AlertCircle size={16} />
                     {erro}
                   </div>
                 )}
               </div>
 
-              <div className="flex border-b border-gray-200 px-5">
+              <div className="flex border-b border-gray-200 dark:border-white/10 px-5">
                 {TABS.map(({ key, label, icon: Icon }) => (
                   <button
                     key={key}
@@ -586,11 +613,11 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                             <div
                               key={n.valor}
                               className={`flex items-start gap-3 px-4 py-3 rounded border transition-colors ${
-                                usada ? 'border-copel-laranja/30 bg-copel-laranja/10' : 'border-gray-200 bg-copel-cinza'
+                                usada ? 'border-copel-laranja/30 bg-copel-laranja/10' : 'border-gray-200 dark:border-white/10 bg-copel-cinza'
                               }`}
                             >
                               <div className={`w-8 h-8 rounded flex items-center justify-center text-xs font-bold shrink-0 ${
-                                usada ? 'bg-copel-laranja text-white' : 'bg-gray-200 text-copel-cinza-medio'
+                                usada ? 'bg-copel-laranja text-white' : 'bg-gray-200 dark:bg-white/10 text-copel-cinza-medio'
                               }`}>
                                 {n.label}
                               </div>
@@ -620,8 +647,8 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                       {editando ? (
                         <div className="space-y-5">
                           {form.enderecos.map((end, idx) => (
-                            <div key={idx} className="border border-gray-200 rounded-md overflow-hidden">
-                              <div className="flex items-center justify-between px-5 py-3 bg-copel-cinza border-b border-gray-200">
+                            <div key={idx} className="border border-gray-200 dark:border-white/10 rounded-md overflow-hidden">
+                              <div className="flex items-center justify-between px-5 py-3 bg-copel-cinza border-b border-gray-200 dark:border-white/10">
                                 <span className="text-sm font-medium text-copel-grafite">
                                   Endereço {idx + 1}
                                 </span>
@@ -629,7 +656,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                                   <select
                                     value={end.naturezaServico}
                                     onChange={(e) => atualizarEndereco(idx, 'naturezaServico', e.target.value)}
-                                    className="px-2.5 py-1.5 border border-gray-300 bg-white rounded text-xs font-medium focus:border-copel-laranja transition-colors"
+                                    className="px-2.5 py-1.5 border border-gray-300 dark:border-white/15 bg-white dark:bg-[#20232a] rounded text-xs font-medium focus:border-copel-laranja transition-colors"
                                   >
                                     {NATUREZAS_SERVICOS.map((n) => (
                                       <option key={n.valor} value={n.valor}>{n.label} — {n.descricao}</option>
@@ -638,7 +665,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                                   {form.enderecos.length > 1 && (
                                     <button
                                       onClick={() => removerEndereco(idx)}
-                                      className="p-1.5 text-copel-cinza-medio hover:text-red-500 hover:bg-red-50 rounded transition-colors cursor-pointer"
+                                      className="p-1.5 text-copel-cinza-medio hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded transition-colors cursor-pointer"
                                     >
                                       <Trash2 size={14} />
                                     </button>
@@ -693,20 +720,22 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                                       inputMode="decimal"
                                       value={end.qtdExtensao}
                                       onChange={(e) => atualizarEndereco(idx, 'qtdExtensao', e.target.value)}
+                                      onBlur={() => formatarQtdExtensaoAoSair(idx)}
                                       placeholder="0"
                                       className={`${inputNumCls} text-center`}
                                     />
                                   </div>
                                   <div>
-                                    <label className="block mb-1.5 text-xs font-medium text-copel-cinza-medio">Largura (m)</label>
+                                    <label className="block mb-1.5 text-xs font-medium text-copel-cinza-medio">
+                                      Largura (m) <span className="font-normal normal-case">— automático</span>
+                                    </label>
                                     <input
                                       id={`InputLargura_${idx}`}
                                       type="text"
-                                      inputMode="decimal"
                                       value={end.larguraM}
-                                      onChange={(e) => atualizarEndereco(idx, 'larguraM', e.target.value)}
-                                      placeholder="0"
-                                      className={`${inputNumCls} text-center`}
+                                      disabled
+                                      readOnly
+                                      className={`${inputNumCls} text-center disabled:bg-copel-cinza dark:disabled:bg-white/5 disabled:cursor-not-allowed`}
                                     />
                                   </div>
                                   <div>
@@ -721,15 +750,16 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                                     />
                                   </div>
                                   <div>
-                                    <label className="block mb-1.5 text-xs font-medium text-copel-cinza-medio">Área (m²)</label>
+                                    <label className="block mb-1.5 text-xs font-medium text-copel-cinza-medio">
+                                      Área (m²) <span className="font-normal normal-case">— automático</span>
+                                    </label>
                                     <input
                                       id={`InputArea_${idx}`}
                                       type="text"
-                                      inputMode="decimal"
                                       value={end.areaM2}
-                                      onChange={(e) => atualizarEndereco(idx, 'areaM2', e.target.value)}
-                                      placeholder="0"
-                                      className={`${inputNumCls} text-center`}
+                                      disabled
+                                      readOnly
+                                      className={`${inputNumCls} text-center disabled:bg-copel-cinza dark:disabled:bg-white/5 disabled:cursor-not-allowed`}
                                     />
                                   </div>
                                 </div>
@@ -750,9 +780,9 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                         </div>
                       ) : (
                         <div className="overflow-x-auto">
-                          <table className="w-full text-sm border border-gray-200 rounded-md">
+                          <table className="w-full text-sm border border-gray-200 dark:border-white/10 rounded-md">
                             <thead>
-                              <tr className="bg-copel-cinza border-b border-gray-200">
+                              <tr className="bg-copel-cinza border-b border-gray-200 dark:border-white/10">
                                 <th className="px-3 py-2 text-[10px] font-semibold text-copel-cinza-medio uppercase text-center">Natureza</th>
                                 <th className="px-3 py-2 text-[10px] font-semibold text-copel-cinza-medio uppercase text-left">Local da Obra</th>
                                 <th className="px-3 py-2 text-[10px] font-semibold text-copel-cinza-medio uppercase text-center">Rua 1</th>
@@ -769,15 +799,15 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                                 ? alvara.enderecos
                                 : [{ naturezaServico: '5', localObra: '', transversal1: '', transversal2: '', qtdExtensao: 0, larguraM: 0, pavimento: '', areaM2: 0, folhaNumero: '' }]
                               ).map((end, idx) => (
-                                <tr key={idx} className="border-b border-gray-100 last:border-0">
+                                <tr key={idx} className="border-b border-gray-100 dark:border-white/5 last:border-0">
                                   <td className="px-3 py-2.5 text-center text-xs font-semibold">{end.naturezaServico}</td>
                                   <td className="px-3 py-2.5 text-xs">{end.localObra || '—'}</td>
                                   <td className="px-3 py-2.5 text-xs text-center">{end.transversal1 || '—'}</td>
                                   <td className="px-3 py-2.5 text-xs text-center">{end.transversal2 || '—'}</td>
-                                  <td className="px-3 py-2.5 text-xs text-center">{end.qtdExtensao}</td>
-                                  <td className="px-3 py-2.5 text-xs text-center">{end.larguraM}</td>
+                                  <td className="px-3 py-2.5 text-xs text-center">{formatarNumeroPlanilha(end.qtdExtensao)}</td>
+                                  <td className="px-3 py-2.5 text-xs text-center">{formatarNumeroPlanilha(end.larguraM)}</td>
                                   <td className="px-3 py-2.5 text-xs text-center">{end.pavimento || '—'}</td>
-                                  <td className="px-3 py-2.5 text-xs text-center">{end.areaM2}</td>
+                                  <td className="px-3 py-2.5 text-xs text-center">{formatarNumeroPlanilha(end.areaM2)}</td>
                                   <td className="px-3 py-2.5 text-xs text-center">{end.folhaNumero || '—'}</td>
                                 </tr>
                               ))}
@@ -788,7 +818,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                     </div>
 
                     <div className="mt-6 grid grid-cols-2 gap-4">
-                      <div className="border border-gray-200 rounded-md p-4">
+                      <div className="border border-gray-200 dark:border-white/10 rounded-md p-4">
                         <label className="block text-[10px] font-semibold text-copel-cinza-medio uppercase tracking-wider mb-1.5">
                           Total de Postes
                         </label>
@@ -808,7 +838,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                           <span className="text-xs text-copel-cinza-medio">UND</span>
                         </div>
                       </div>
-                      <div className="border border-gray-200 rounded-md p-4">
+                      <div className="border border-gray-200 dark:border-white/10 rounded-md p-4">
                         <label className="block text-[10px] font-semibold text-copel-cinza-medio uppercase tracking-wider mb-1.5">
                           Total de Cabo
                         </label>
@@ -839,7 +869,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
 
       {modalMounted && (
         <div
-          className={`fixed inset-0 z-50 flex items-center justify-center px-4 bg-copel-grafite/40 backdrop-blur-[2px] transition-opacity ease-[var(--ease-fluid)] ${
+          className={`fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/40 dark:bg-black/60 backdrop-blur-[2px] transition-opacity ease-[var(--ease-fluid)] ${
             modalEntered ? 'opacity-100 duration-[180ms]' : 'opacity-0 duration-[140ms]'
           }`}
           onClick={() => setModalTipo(null)}
@@ -848,7 +878,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
             role="dialog"
             aria-modal="true"
             aria-labelledby="titulo-modal-painel"
-            className={`bg-white rounded-lg shadow-xl max-w-sm w-full p-6 origin-center transition-[transform,opacity] ease-[var(--ease-fluid)] ${
+            className={`bg-white dark:bg-[#1e2127] rounded-lg shadow-xl max-w-sm w-full p-6 origin-center transition-[transform,opacity] ease-[var(--ease-fluid)] ${
               modalEntered ? 'opacity-100 scale-100 duration-[220ms]' : 'opacity-0 scale-95 duration-[140ms]'
             }`}
             onClick={(e) => e.stopPropagation()}
@@ -856,7 +886,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
             {modalTipo === 'excluir' ? (
               <>
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-500/15 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
                     <AlertCircle size={20} />
                   </div>
                   <div>
@@ -869,7 +899,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                 <div className="mt-6 flex justify-end gap-2">
                   <button
                     onClick={() => setModalTipo(null)}
-                    className="px-4 py-2 bg-white border border-gray-300 text-copel-grafite text-sm font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"
+                    className="px-4 py-2 bg-white dark:bg-[#20232a] border border-gray-300 dark:border-white/15 text-copel-grafite text-sm font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"
                   >
                     Cancelar
                   </button>
@@ -899,7 +929,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                 <div className="mt-6 flex justify-end gap-2">
                   <button
                     onClick={() => salvar(false)}
-                    className="px-4 py-2 bg-white border border-gray-300 text-copel-grafite text-sm font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"
+                    className="px-4 py-2 bg-white dark:bg-[#20232a] border border-gray-300 dark:border-white/15 text-copel-grafite text-sm font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"
                   >
                     Não
                   </button>
@@ -921,7 +951,7 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
 
 function LinhaCampo({ label, children }) {
   return (
-    <div className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+    <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-white/5 last:border-0">
       <span className="text-sm text-copel-cinza-medio">{label}</span>
       <div className="text-sm text-right">{children}</div>
     </div>

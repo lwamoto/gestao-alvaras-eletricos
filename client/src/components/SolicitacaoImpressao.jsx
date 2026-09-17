@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AlertCircle, Printer } from 'lucide-react';
 import { getAlvaraPorProjeto } from '../api.js';
 import { NATUREZAS_SERVICOS } from '../constants.js';
+import { formatarNumeroPlanilha } from '../planilha.js';
 
 // Dados fixos da COPEL/engenheiro responsável — os mesmos em toda Solicitação
 // de Alvará (confirmado com o usuário). Editar aqui se o responsável técnico
@@ -86,7 +87,13 @@ export default function SolicitacaoImpressao({ numeroProjeto }) {
   const naturezasUsadas = new Set((alvara.enderecos || []).map((e) => e.naturezaServico));
 
   return (
-    <div className="bg-white min-h-screen text-copel-grafite">
+    // O documento é impresso em papel — precisa ficar sempre claro, mesmo com o
+    // app inteiro no tema escuro. Redeclara os tokens de cor pro valor original
+    // aqui, sobrescrevendo o que [data-tema="escuro"] redefine no <html>.
+    <div
+      className="bg-white min-h-screen text-copel-grafite"
+      style={{ '--color-copel-grafite': '#222222', '--color-copel-cinza': '#f2f2f2', '--color-copel-cinza-medio': '#8a8a8a' }}
+    >
       <div className="print:hidden sticky top-0 z-10 flex items-center justify-between px-6 py-3 bg-copel-grafite text-white">
         <span className="text-sm font-medium">
           Solicitação de Alvará — Projeto {alvara.numeroProjeto}
@@ -118,68 +125,71 @@ function LabelValor({ label, valor }) {
 function PaginaSolicitacao({ alvara, primeiroEndereco, via, quebrarAntes }) {
   return (
     <div className={`max-w-[190mm] mx-auto px-10 py-10 ${quebrarAntes ? 'break-before-page' : ''}`}>
-      <p className="text-right text-[10px] text-copel-cinza-medio mb-2">{via}</p>
-      <h1 className="text-center text-lg font-bold tracking-wide mb-8">SOLICITAÇÃO DE ALVARÁ</h1>
+      <div className="border-4 border-blue-800 p-8">
+        <p className="text-right text-[10px] text-copel-cinza-medio mb-2">{via}</p>
+        <h1 className="text-center text-lg font-bold tracking-wide mb-8">SOLICITAÇÃO DE ALVARÁ</h1>
 
-      <p className="text-sm mb-1">
-        <span className="font-semibold">ALVARÁ Nº</span> ____________________
-      </p>
-      <p className="text-sm mb-6">
-        <span className="font-semibold">PROJETO:</span> {alvara.numeroProjeto}
-      </p>
-
-      <p className="text-sm mb-4">{dataExtenso()}</p>
-      <p className="text-sm">À {DESTINATARIO.orgao}</p>
-      <p className="text-sm">{DESTINATARIO.coordenadoria}</p>
-      <p className="text-sm mb-4">{DESTINATARIO.engenheira}</p>
-
-      <p className="text-sm leading-relaxed text-justify mb-6">
-        Solicitamos autorização para executar serviços de{' '}
-        <strong>
-          instalação/Substituição de {fraseServicos(alvara.qtdPostes, alvara.qtdCaboM)}
-        </strong>
-        , conforme planilha em anexo, para a contratante <strong>{COPEL_INFO.razaoSocial}</strong>,
-        nos comprometendo a cumprir as determinações da Municipalidade no que se refere às normas
-        e posturas a serem estabelecidas por este Núcleo, de conformidade com a Lei Municipal nº{' '}
-        {LEI_MUNICIPAL}.
-        <br />
-        Anexamos croqui de localização e o cronograma físico de execução da(s) obras(s).
-        <br />
-        Atenciosamente:
-      </p>
-
-      <div className="border border-copel-grafite p-4 mb-6 space-y-1">
-        <LabelValor label="Razão Social" valor={COPEL_INFO.razaoSocial} />
-        <LabelValor label="CNPJ/CPF" valor={COPEL_INFO.cnpj} />
-        <div className="flex flex-wrap gap-x-8">
-          <LabelValor label="Endereço" valor={COPEL_INFO.endereco} />
-          <LabelValor label="Nº" valor={COPEL_INFO.numero} />
-        </div>
-        <div className="flex flex-wrap gap-x-8">
-          <LabelValor label="Cidade/UF" valor={COPEL_INFO.cidadeUf} />
-          <LabelValor label="Bairro" valor={COPEL_INFO.bairro} />
-        </div>
-        <LabelValor label="Telefone" valor={COPEL_INFO.telefone} />
-        <LabelValor label="E-mail" valor={COPEL_INFO.email} />
-        <LabelValor label="Responsável Técnico" valor={COPEL_INFO.responsavelTecnico} />
-        <div className="flex flex-wrap gap-x-8">
-          <LabelValor label="Número do CREA" valor={COPEL_INFO.crea} />
-          <LabelValor label="Estado" valor={COPEL_INFO.estado} />
-        </div>
-      </div>
-
-      <div className="border border-copel-grafite p-4 space-y-1">
-        <p className="text-sm font-semibold">Local da obra:</p>
-        <p className="text-sm">{primeiroEndereco?.localObra || '—'}</p>
-        <LabelValor label="Tipo de Pavimento" valor={primeiroEndereco?.pavimento || '—'} />
-        <LabelValor label="Metragem" valor="CONFORME PLANILHA EM ANEXO" />
-        <p className="text-sm">
-          <span className="font-semibold">Data de execução:</span> CONFORME PLANILHA EM ANEXO (
-          {PRAZO_EXECUCAO_DIAS} dias)
+        <p className="text-sm mb-1">
+          <span className="font-semibold">ALVARÁ Nº</span> ____________________
         </p>
-        <p className="text-sm pt-2">
-          Obs: Autorização de trânsito será solicitada posteriormente.
+        <p className="text-sm mb-6">
+          <span className="font-semibold">PROJETO:</span>{' '}
+          <span className="text-red-600 font-semibold">{alvara.numeroProjeto}</span>
         </p>
+
+        <p className="text-sm mb-4">{dataExtenso()}</p>
+        <p className="text-sm">À {DESTINATARIO.orgao}</p>
+        <p className="text-sm">{DESTINATARIO.coordenadoria}</p>
+        <p className="text-sm mb-4">{DESTINATARIO.engenheira}</p>
+
+        <p className="text-sm leading-relaxed text-justify mb-6">
+          Solicitamos autorização para executar serviços de{' '}
+          <strong className="text-red-600">
+            instalação/Substituição de {fraseServicos(alvara.qtdPostes, alvara.qtdCaboM)}
+          </strong>
+          , conforme planilha em anexo, para a contratante <strong>{COPEL_INFO.razaoSocial}</strong>,
+          nos comprometendo a cumprir as determinações da Municipalidade no que se refere às normas
+          e posturas a serem estabelecidas por este Núcleo, de conformidade com a Lei Municipal nº{' '}
+          {LEI_MUNICIPAL}.
+          <br />
+          Anexamos croqui de localização e o cronograma físico de execução da(s) obras(s).
+          <br />
+          Atenciosamente:
+        </p>
+
+        <div className="border border-copel-grafite p-4 mb-6 space-y-1">
+          <LabelValor label="Razão Social" valor={COPEL_INFO.razaoSocial} />
+          <LabelValor label="CNPJ/CPF" valor={COPEL_INFO.cnpj} />
+          <div className="flex flex-wrap gap-x-8">
+            <LabelValor label="Endereço" valor={COPEL_INFO.endereco} />
+            <LabelValor label="Nº" valor={COPEL_INFO.numero} />
+          </div>
+          <div className="flex flex-wrap gap-x-8">
+            <LabelValor label="Cidade/UF" valor={COPEL_INFO.cidadeUf} />
+            <LabelValor label="Bairro" valor={COPEL_INFO.bairro} />
+          </div>
+          <LabelValor label="Telefone" valor={COPEL_INFO.telefone} />
+          <LabelValor label="E-mail" valor={COPEL_INFO.email} />
+          <LabelValor label="Responsável Técnico" valor={COPEL_INFO.responsavelTecnico} />
+          <div className="flex flex-wrap gap-x-8">
+            <LabelValor label="Número do CREA" valor={COPEL_INFO.crea} />
+            <LabelValor label="Estado" valor={COPEL_INFO.estado} />
+          </div>
+        </div>
+
+        <div className="border border-copel-grafite p-4 space-y-1">
+          <p className="text-sm font-semibold">Local da obra:</p>
+          <p className="text-sm text-red-600 font-medium">{primeiroEndereco?.localObra || '—'}</p>
+          <LabelValor label="Tipo de Pavimento" valor={primeiroEndereco?.pavimento || '—'} />
+          <LabelValor label="Metragem" valor="CONFORME PLANILHA EM ANEXO" />
+          <p className="text-sm">
+            <span className="font-semibold">Data de execução:</span> CONFORME PLANILHA EM ANEXO (
+            {PRAZO_EXECUCAO_DIAS} dias)
+          </p>
+          <p className="text-sm pt-2">
+            Obs: Autorização de trânsito será solicitada posteriormente.
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -254,10 +264,10 @@ function PaginaPlanilha({ alvara, naturezasUsadas }) {
               <td className={`${tdCls} break-words`}>{e.localObra || '—'}</td>
               <td className={`${tdCls} break-words`}>{e.transversal1 || '—'}</td>
               <td className={`${tdCls} break-words`}>{e.transversal2 || '—'}</td>
-              <td className={`${tdCls} text-center`}>{e.qtdExtensao}</td>
-              <td className={`${tdCls} text-center`}>{e.larguraM}</td>
+              <td className={`${tdCls} text-center`}>{formatarNumeroPlanilha(e.qtdExtensao)}</td>
+              <td className={`${tdCls} text-center`}>{formatarNumeroPlanilha(e.larguraM)}</td>
               <td className={tdCls}>{e.pavimento || '—'}</td>
-              <td className={`${tdCls} text-center`}>{e.areaM2}</td>
+              <td className={`${tdCls} text-center`}>{formatarNumeroPlanilha(e.areaM2)}</td>
             </tr>
           ))}
         </tbody>

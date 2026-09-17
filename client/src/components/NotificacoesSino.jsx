@@ -72,13 +72,13 @@ export default function NotificacoesSino({ onAbrirProjeto }) {
       >
         <Bell size={17} />
         {naoLidas > 0 && (
-          <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white" />
+          <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-[#1a1c22]" />
         )}
       </button>
 
       {aberto && (
-        <div className="absolute left-0 mt-1.5 w-80 max-w-[90vw] bg-white border border-gray-200 rounded-md shadow-lg z-30 origin-top-left animate-[pop-in_160ms_var(--ease-fluid)]">
-          <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
+        <div className="absolute left-0 mt-1.5 w-80 max-w-[90vw] bg-white dark:bg-[#20232a] border border-gray-200 dark:border-white/10 rounded-md shadow-lg z-30 origin-top-left animate-[pop-in_160ms_var(--ease-fluid)]">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 dark:border-white/5">
             <span className="text-xs font-semibold text-copel-grafite uppercase tracking-wider">Notificações</span>
             {naoLidas > 0 && (
               <button
@@ -96,7 +96,7 @@ export default function NotificacoesSino({ onAbrirProjeto }) {
               <div className="py-8 text-center text-xs text-copel-cinza-medio">Carregando...</div>
             ) : notificacoes.length === 0 ? (
               <div className="py-10 text-center">
-                <Inbox size={24} className="mx-auto text-gray-300 mb-2" />
+                <Inbox size={24} className="mx-auto text-gray-300 dark:text-white/15 mb-2" />
                 <p className="text-xs text-copel-cinza-medio">Nenhuma notificação ainda.</p>
               </div>
             ) : (
@@ -105,7 +105,7 @@ export default function NotificacoesSino({ onAbrirProjeto }) {
                   <li key={n._id}>
                     <button
                       onClick={() => handleClicarNotificacao(n)}
-                      className={`w-full text-left px-4 py-3 border-b border-gray-100 last:border-0 hover:bg-copel-cinza transition-colors cursor-pointer flex items-start gap-2 ${
+                      className={`w-full text-left px-4 py-3 border-b border-gray-100 dark:border-white/5 last:border-0 hover:bg-copel-cinza transition-colors cursor-pointer flex items-start gap-2 ${
                         n.lida ? '' : 'bg-copel-laranja/5'
                       }`}
                     >

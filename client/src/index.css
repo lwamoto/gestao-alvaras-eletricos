@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* dark: vira controlado por atributo (nosso toggle), não por prefers-color-scheme
+   do SO — dá pro usuário escolher independente do tema do Windows. */
+@custom-variant dark (&:where([data-tema="escuro"], [data-tema="escuro"] *));
+
 @theme {
   --color-copel-laranja: #f58220;
   --color-copel-grafite: #222222;
@@ -18,6 +22,21 @@ body {
   color: #222222;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  transition: background-color 200ms var(--ease-fluid), color 200ms var(--ease-fluid);
+}
+
+[data-tema="escuro"] body {
+  background-color: #16181c;
+  color: #e8e8e8;
+}
+
+/* Redefine os tokens da marca no escuro — todo `bg-copel-cinza`/`text-copel-grafite`/
+   `text-copel-cinza-medio` já existente no app passa a usar essas cores sem precisar
+   editar cada componente. `copel-laranja` fica igual nos dois temas (é a marca). */
+[data-tema="escuro"] {
+  --color-copel-grafite: #e8e8e8;
+  --color-copel-cinza: #262932;
+  --color-copel-cinza-medio: #9a9ea8;
 }
 
 @keyframes pop-in {
@@ -73,6 +92,14 @@ button:focus-visible {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+[data-tema="escuro"] ::-webkit-scrollbar-thumb {
+  background: #4b4f56;
+}
+
+[data-tema="escuro"] ::-webkit-scrollbar-thumb:hover {
+  background: #5f636b;
 }
 
 @page {

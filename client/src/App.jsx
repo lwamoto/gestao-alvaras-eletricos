@@ -11,6 +11,7 @@ import Dashboard from './components/Dashboard.jsx';
 import { createAlvara } from './api.js';
 import { FUNDOS_CADASTRO, indiceFundoAtual } from './fundoCadastro.js';
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
+import { ThemeProvider } from './contexts/ThemeContext.jsx';
 
 const VIEWS_VALIDAS = ['dashboard', 'cadastrar', 'pesquisar', 'usuarios', 'empreiteiras'];
 
@@ -34,9 +35,11 @@ function lerSidebarRecolhida() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppShell />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppShell />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
@@ -146,7 +149,7 @@ function AppShell() {
             className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${FUNDOS_CADASTRO[indiceFundo]})` }}
           />
-          <div className="absolute inset-0 bg-white/75" />
+          <div className="absolute inset-0 bg-white/75 dark:bg-[#16181c]/85" />
         </div>
       )}
 

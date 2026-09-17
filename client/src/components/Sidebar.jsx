@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { FilePlus, Search, Menu, PanelLeftClose, PanelLeftOpen, LogOut, Users, Building2, LayoutDashboard } from 'lucide-react';
+import { FilePlus, Search, Menu, PanelLeftClose, PanelLeftOpen, LogOut, Users, Building2, LayoutDashboard, Sun, Moon } from 'lucide-react';
 import BrandMark from './BrandMark.jsx';
 import NotificacoesSino from './NotificacoesSino.jsx';
+import { useTheme } from '../contexts/ThemeContext.jsx';
 
 const NAV_ITEMS_COPEL = [
   { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -17,6 +18,7 @@ const NAV_ITEMS_EMPREITEIRA = [
 ];
 
 export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse, usuario, onLogout, onAbrirProjeto }) {
+  const { tema, alternarTema } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [drawerMounted, setDrawerMounted] = useState(false);
   const [drawerEntered, setDrawerEntered] = useState(false);
@@ -57,6 +59,14 @@ export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse,
           <BrandMark collapsed={recolhida} />
           <div className={`flex items-center ${recolhida ? 'flex-col gap-2' : 'gap-1 shrink-0'}`}>
             {usuario?.tipo === 'EMPREITEIRA' && <NotificacoesSino onAbrirProjeto={onAbrirProjeto} />}
+            <button
+              onClick={alternarTema}
+              aria-label={tema === 'claro' ? 'Ativar tema escuro' : 'Ativar tema claro'}
+              title={tema === 'claro' ? 'Tema escuro' : 'Tema claro'}
+              className="p-1.5 rounded text-copel-cinza-medio hover:text-copel-grafite hover:bg-copel-cinza active:scale-90 transition-all cursor-pointer shrink-0"
+            >
+              {tema === 'claro' ? <Moon size={16} /> : <Sun size={16} />}
+            </button>
             {onToggleCollapse && (
               <button
                 onClick={onToggleCollapse}
@@ -103,7 +113,7 @@ export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse,
           </ul>
         </nav>
 
-        <div className={`border-t border-gray-100 ${recolhida ? 'px-3 py-3 flex flex-col items-center gap-2' : 'px-5 py-4'}`}>
+        <div className={`border-t border-gray-100 dark:border-white/10 ${recolhida ? 'px-3 py-3 flex flex-col items-center gap-2' : 'px-5 py-4'}`}>
           {!recolhida && (
             <>
               <p className="text-xs font-medium text-copel-grafite truncate">{usuario?.nome}</p>
@@ -117,7 +127,7 @@ export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse,
             title="Sair"
             aria-label="Sair"
             className={`inline-flex items-center gap-1.5 text-copel-cinza-medio hover:text-red-600 transition-colors cursor-pointer ${
-              recolhida ? 'p-1.5 rounded hover:bg-red-50' : 'text-xs'
+              recolhida ? 'p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-500/10' : 'text-xs'
             }`}
           >
             <LogOut size={recolhida ? 16 : 13} />
@@ -131,17 +141,24 @@ export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse,
   return (
     <>
       <aside
-        className={`hidden lg:flex flex-col fixed left-0 top-0 bottom-0 bg-white border-r border-gray-200 z-50 transition-[width] duration-200 ease-[var(--ease-fluid)] ${
+        className={`hidden lg:flex flex-col fixed left-0 top-0 bottom-0 bg-white dark:bg-[#1a1c22] border-r border-gray-200 dark:border-white/10 z-50 transition-[width] duration-200 ease-[var(--ease-fluid)] ${
           collapsed ? 'w-16' : 'w-64'
         }`}
       >
         {renderNavContent(collapsed)}
       </aside>
 
-      <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 sticky top-0 z-50">
+      <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-white dark:bg-[#1a1c22] border-b border-gray-200 dark:border-white/10 sticky top-0 z-50">
         <BrandMark collapsed={false} />
         <div className="flex items-center gap-1">
           {usuario?.tipo === 'EMPREITEIRA' && <NotificacoesSino onAbrirProjeto={onAbrirProjeto} />}
+          <button
+            onClick={alternarTema}
+            aria-label={tema === 'claro' ? 'Ativar tema escuro' : 'Ativar tema claro'}
+            className="p-2 text-copel-cinza-medio hover:text-copel-grafite rounded cursor-pointer active:scale-90 transition-transform"
+          >
+            {tema === 'claro' ? <Moon size={18} /> : <Sun size={18} />}
+          </button>
           <button
             onClick={() => setMobileOpen((v) => !v)}
             className="p-2 text-copel-cinza-medio hover:text-copel-grafite rounded cursor-pointer active:scale-90 transition-transform"
@@ -161,7 +178,7 @@ export default function Sidebar({ view, onNavigate, collapsed, onToggleCollapse,
           onClick={() => setMobileOpen(false)}
         >
           <div
-            className={`absolute left-0 top-0 bottom-0 w-64 bg-white flex flex-col shadow-xl transition-transform ease-[var(--ease-fluid)] ${
+            className={`absolute left-0 top-0 bottom-0 w-64 bg-white dark:bg-[#1a1c22] flex flex-col shadow-xl transition-transform ease-[var(--ease-fluid)] ${
               drawerEntered ? 'translate-x-0 duration-[280ms]' : '-translate-x-full duration-[200ms]'
             }`}
             onClick={(e) => e.stopPropagation()}

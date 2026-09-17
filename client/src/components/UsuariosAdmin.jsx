@@ -4,7 +4,7 @@ import { listUsuarios, createUsuario, updateUsuario, deleteUsuario } from '../us
 import { listEmpreiteiras } from '../empreiteirasApi.js';
 
 const inputCls =
-  'w-full px-3.5 py-2.5 border border-gray-300 bg-white rounded text-sm text-copel-grafite placeholder:text-copel-cinza-medio focus:border-copel-laranja transition-colors';
+  'w-full px-3.5 py-2.5 border border-gray-300 dark:border-white/15 bg-white dark:bg-[#20232a] rounded text-sm text-copel-grafite placeholder:text-copel-cinza-medio focus:border-copel-laranja transition-colors';
 
 const vazio = { nome: '', email: '', chaveAcesso: '', senha: '', tipo: 'COPEL', empreiteira: '' };
 
@@ -107,14 +107,14 @@ export default function UsuariosAdmin({ usuarioLogado }) {
 
   return (
     <div>
-      <div className="pb-6 mb-8 border-b border-gray-200">
+      <div className="pb-6 mb-8 border-b border-gray-200 dark:border-white/10">
         <h1 className="text-xl font-semibold text-copel-grafite">Usuários</h1>
         <p className="mt-1 text-sm text-copel-cinza-medio">
           Funcionários COPEL enxergam todos os alvarás. Usuários de empreiteira só veem os alvarás PARTICULAR da própria empreiteira.
         </p>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-md shadow-sm p-6 sm:p-8 mb-6">
+      <div className="bg-white dark:bg-[#1e2127] border border-gray-200 dark:border-white/10 rounded-md shadow-sm p-6 sm:p-8 mb-6">
         <h2 className="text-sm font-semibold text-copel-grafite mb-4">
           {editandoId ? 'Editar usuário' : 'Novo usuário'}
         </h2>
@@ -199,24 +199,24 @@ export default function UsuariosAdmin({ usuarioLogado }) {
           </div>
 
           {sucesso && (
-            <div className="sm:col-span-2 flex items-center gap-2 px-3.5 py-2.5 bg-green-50 border border-green-200 text-green-700 rounded text-sm">
+            <div className="sm:col-span-2 flex items-center gap-2 px-3.5 py-2.5 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 text-green-700 dark:text-green-400 rounded text-sm">
               <Check size={16} />
               Usuário salvo com sucesso!
             </div>
           )}
           {erro && (
-            <div className="sm:col-span-2 flex items-center gap-2 px-3.5 py-2.5 bg-red-50 border border-red-200 text-red-700 rounded text-sm">
+            <div className="sm:col-span-2 flex items-center gap-2 px-3.5 py-2.5 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-400 rounded text-sm">
               <AlertCircle size={16} />
               {erro}
             </div>
           )}
 
-          <div className="sm:col-span-2 flex justify-end gap-2 border-t border-gray-100 pt-6">
+          <div className="sm:col-span-2 flex justify-end gap-2 border-t border-gray-100 dark:border-white/5 pt-6">
             {editandoId && (
               <button
                 type="button"
                 onClick={cancelarEdicao}
-                className="px-4 py-2.5 bg-white border border-gray-300 text-copel-grafite text-sm font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"
+                className="px-4 py-2.5 bg-white dark:bg-[#20232a] border border-gray-300 dark:border-white/15 text-copel-grafite text-sm font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"
               >
                 Cancelar
               </button>
@@ -224,7 +224,7 @@ export default function UsuariosAdmin({ usuarioLogado }) {
             <button
               type="submit"
               disabled={enviando}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-copel-laranja text-white text-sm font-medium rounded hover:brightness-90 disabled:bg-gray-200 disabled:text-copel-cinza-medio disabled:cursor-not-allowed transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-copel-laranja text-white text-sm font-medium rounded hover:brightness-90 disabled:bg-gray-200 dark:disabled:bg-white/10 disabled:text-copel-cinza-medio disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
               <UserPlus size={16} />
               {enviando ? 'Salvando...' : editandoId ? 'Salvar alterações' : 'Adicionar usuário'}
@@ -233,12 +233,12 @@ export default function UsuariosAdmin({ usuarioLogado }) {
         </form>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-md shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-[#1e2127] border border-gray-200 dark:border-white/10 rounded-md shadow-sm overflow-hidden">
         {carregando ? (
           <div className="p-8 text-center text-sm text-copel-cinza-medio">Carregando...</div>
         ) : usuarios.length === 0 ? (
           <div className="p-8 text-center">
-            <Users size={28} className="mx-auto text-gray-300 mb-2" />
+            <Users size={28} className="mx-auto text-gray-300 dark:text-white/15 mb-2" />
             <p className="text-sm text-copel-cinza-medio">Nenhum usuário cadastrado ainda.</p>
           </div>
         ) : (
@@ -246,14 +246,14 @@ export default function UsuariosAdmin({ usuarioLogado }) {
             {usuarios.map((u) => (
               <li
                 key={u.id}
-                className="flex items-center justify-between gap-3 px-5 py-3 border-b border-gray-100 last:border-0"
+                className="flex items-center justify-between gap-3 px-5 py-3 border-b border-gray-100 dark:border-white/5 last:border-0"
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm font-medium text-copel-grafite truncate">{u.nome}</span>
                     <span
                       className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded shrink-0 ${
-                        u.tipo === 'COPEL' ? 'bg-copel-laranja/10 text-copel-laranja' : 'bg-blue-50 text-blue-700'
+                        u.tipo === 'COPEL' ? 'bg-copel-laranja/10 text-copel-laranja' : 'bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400'
                       }`}
                     >
                       {u.tipo === 'COPEL' ? 'COPEL' : u.empreiteira}
@@ -266,7 +266,7 @@ export default function UsuariosAdmin({ usuarioLogado }) {
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => iniciarEdicao(u)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 text-copel-grafite text-xs font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-[#20232a] border border-gray-300 dark:border-white/15 text-copel-grafite text-xs font-medium rounded hover:bg-copel-cinza active:scale-[0.97] transition-all cursor-pointer"
                   >
                     <Pencil size={13} />
                     Editar
@@ -278,7 +278,7 @@ export default function UsuariosAdmin({ usuarioLogado }) {
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded active:scale-[0.97] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                       confirmandoId === u.id
                         ? 'bg-red-600 text-white hover:bg-red-700'
-                        : 'bg-white border border-gray-300 text-red-600 hover:bg-red-50'
+                        : 'bg-white dark:bg-[#20232a] border border-gray-300 dark:border-white/15 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10'
                     }`}
                   >
                     {confirmandoId === u.id ? (

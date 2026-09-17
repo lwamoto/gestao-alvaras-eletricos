@@ -5,6 +5,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from 'recharts';
 import { getEstatisticas } from '../api.js';
+import { useTheme } from '../contexts/ThemeContext.jsx';
 
 const CORES_SITUACAO = {
   A_FAZER: '#9ca3af',
@@ -20,7 +21,7 @@ const LABEL_SITUACAO = {
   NAO_NECESSARIO: 'Não necessário',
 };
 
-const cardCls = 'bg-white border border-gray-200 rounded-md shadow-sm p-5';
+const cardCls = 'bg-white dark:bg-[#1e2127] border border-gray-200 dark:border-white/10 rounded-md shadow-sm p-5';
 
 function CardResumo({ icon: Icon, label, valor, cor }) {
   return (
@@ -39,9 +40,16 @@ function CardResumo({ icon: Icon, label, valor, cor }) {
 }
 
 export default function Dashboard({ usuario }) {
+  const { tema } = useTheme();
   const [dados, setDados] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
+  const corGrade = tema === 'escuro' ? '#333740' : '#f2f2f2';
+  const corTick = tema === 'escuro' ? '#9a9ea8' : '#8a8a8a';
+  const corTickForte = tema === 'escuro' ? '#e8e8e8' : '#222222';
+  const estiloTooltip = tema === 'escuro'
+    ? { backgroundColor: '#20232a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, color: '#e8e8e8' }
+    : { backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: 6, color: '#222222' };
 
   useEffect(() => {
     getEstatisticas()
@@ -60,7 +68,7 @@ export default function Dashboard({ usuario }) {
 
   if (erro || !dados) {
     return (
-      <div className="flex items-center gap-2 px-3.5 py-2.5 bg-red-50 border border-red-200 text-red-700 rounded text-sm">
+      <div className="flex items-center gap-2 px-3.5 py-2.5 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-700 dark:text-red-400 rounded text-sm">
         <AlertCircle size={16} />
         {erro || 'Não foi possível carregar as estatísticas.'}
       </div>
@@ -75,7 +83,7 @@ export default function Dashboard({ usuario }) {
 
   return (
     <div>
-      <div className="pb-6 mb-8 border-b border-gray-200">
+      <div className="pb-6 mb-8 border-b border-gray-200 dark:border-white/10">
         <h1 className="text-xl font-semibold text-copel-grafite">Dashboard</h1>
         <p className="mt-1 text-sm text-copel-cinza-medio">
           {usuario?.tipo === 'EMPREITEIRA'
@@ -93,7 +101,7 @@ export default function Dashboard({ usuario }) {
 
       {semDados ? (
         <div className={cardCls + ' text-center py-14'}>
-          <Ban size={28} className="mx-auto text-gray-300 mb-2" />
+          <Ban size={28} className="mx-auto text-gray-300 dark:text-white/15 mb-2" />
           <p className="text-sm text-copel-cinza-medio">Nenhum alvará cadastrado ainda pra gerar estatísticas.</p>
         </div>
       ) : (
@@ -114,8 +122,8 @@ export default function Dashboard({ usuario }) {
                     <Cell key={item.situacao} fill={CORES_SITUACAO[item.situacao]} />
                   ))}
                 </Pie>
-                <Tooltip />
-                <Legend verticalAlign="bottom" height={36} />
+                <Tooltip contentStyle={estiloTooltip} />
+                <Legend verticalAlign="bottom" height={36} wrapperStyle={{ color: corTickForte }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -127,10 +135,10 @@ export default function Dashboard({ usuario }) {
             ) : (
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={dados.porResponsavel} layout="vertical" margin={{ left: 8 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f2f2f2" />
-                  <XAxis type="number" allowDecimals={false} tick={{ fontSize: 12, fill: '#8a8a8a' }} />
-                  <YAxis type="category" dataKey="nome" width={90} tick={{ fontSize: 12, fill: '#222222' }} />
-                  <Tooltip />
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={corGrade} />
+                  <XAxis type="number" allowDecimals={false} tick={{ fontSize: 12, fill: corTick }} />
+                  <YAxis type="category" dataKey="nome" width={90} tick={{ fontSize: 12, fill: corTickForte }} />
+                  <Tooltip contentStyle={estiloTooltip} />
                   <Bar dataKey="total" fill="#f58220" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -145,10 +153,10 @@ export default function Dashboard({ usuario }) {
               ) : (
                 <ResponsiveContainer width="100%" height={260}>
                   <BarChart data={dados.porEmpreiteira} margin={{ top: 8 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f2f2f2" />
-                    <XAxis dataKey="nome" tick={{ fontSize: 12, fill: '#222222' }} />
-                    <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#8a8a8a' }} />
-                    <Tooltip />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={corGrade} />
+                    <XAxis dataKey="nome" tick={{ fontSize: 12, fill: corTickForte }} />
+                    <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: corTick }} />
+                    <Tooltip contentStyle={estiloTooltip} />
                     <Bar dataKey="total" fill="#f58220" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
