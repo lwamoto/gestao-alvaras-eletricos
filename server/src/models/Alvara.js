@@ -33,7 +33,18 @@ const alvaraSchema = new mongoose.Schema(
       default: 'A_FAZER',
     },
     dataMarcada: { type: Date, default: Date.now },
-    responsavel: { type: String, trim: true, default: '' },
+    // Data em que o número do alvará (abaixo) foi efetivamente recebido —
+    // só faz sentido quando situacao === 'RECEBIDO', mas fica livre pra
+    // não travar edição fora de ordem.
+    dataRecebimentoAlvara: { type: Date },
+    // Número real emitido pela prefeitura (ex: "2026/0017734").
+    numeroAlvara: { type: String, trim: true, default: '' },
+    // Protocolo interno da empreiteira (padrão "01.<código>") — só relevante
+    // pra alvará PARTICULAR, mas não é obrigatório.
+    protocolo: { type: String, trim: true, default: '' },
+    // uppercase:true evita "gustavo"/"GUSTAVO"/"Gustavo" quebrando o
+    // agrupamento por responsável no Dashboard.
+    responsavel: { type: String, trim: true, uppercase: true, default: '' },
     ruaPrincipal: { type: String, trim: true, default: '' },
     transversal1: { type: String, trim: true, default: '' },
     transversal2: { type: String, trim: true, default: '' },

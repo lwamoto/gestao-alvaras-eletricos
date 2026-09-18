@@ -27,3 +27,6 @@ Thumbs.db
 .vite/
 .cache/
 .impeccable/hook.cache.json
+
+# Artefatos de automação de navegador (Playwright MCP)
+.playwright-mcp/

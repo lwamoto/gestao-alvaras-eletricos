@@ -15,6 +15,7 @@ import { getAlvaraPorProjeto, updateAlvara, deleteAlvara } from '../api.js';
 import { corDoTipo, corDoNumero } from '../cores.js';
 import { NATUREZAS_SERVICOS } from '../constants.js';
 import { formatarNumeroPlanilha, calcularLarguraArea } from '../planilha.js';
+import { formatarProtocolo } from '../protocolo.js';
 import { useAuth } from '../contexts/AuthContext.jsx';
 
 const SITUACOES = ['A_FAZER', 'ENVIADO', 'RECEBIDO', 'NAO_NECESSARIO'];
@@ -64,6 +65,22 @@ function formatarData(iso) {
   return new Date(iso).toLocaleString('pt-BR');
 }
 
+function paraInputDate(iso) {
+  if (!iso) return '';
+  return new Date(iso).toISOString().slice(0, 10);
+}
+
+// dataRecebimentoAlvara é uma data "pura" (salva à meia-noite UTC) — formatar
+// com toLocaleString aplicaria o fuso local e voltaria um dia (ex: UTC-3
+// mostraria 13/09 pra uma data salva como 14/09). Usa os componentes UTC.
+function formatarDataSomente(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const dia = String(d.getUTCDate()).padStart(2, '0');
+  const mes = String(d.getUTCMonth() + 1).padStart(2, '0');
+  return `${dia}/${mes}/${d.getUTCFullYear()}`;
+}
+
 function parseFloatSafe(v) {
   const n = parseFloat(String(v).replace(',', '.'));
   return Number.isFinite(n) ? n : 0;
@@ -89,6 +106,9 @@ function formToState(dados) {
     numeroProjeto: dados.numeroProjeto,
     situacao: dados.situacao,
     responsavel: dados.responsavel || '',
+    protocolo: dados.protocolo || '',
+    numeroAlvara: dados.numeroAlvara || '',
+    dataRecebimentoAlvara: paraInputDate(dados.dataRecebimentoAlvara),
     enderecos: dados.enderecos && dados.enderecos.length > 0
       ? dados.enderecos.map((e) => {
           const naturezaServico = e.naturezaServico || '5';
@@ -271,6 +291,9 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
       const payload = {
         situacao: form.situacao,
         responsavel: form.responsavel,
+        protocolo: alvara.tipo === 'PARTICULAR' ? formatarProtocolo(form.protocolo) : '',
+        numeroAlvara: form.numeroAlvara,
+        dataRecebimentoAlvara: form.dataRecebimentoAlvara ? new Date(form.dataRecebimentoAlvara) : null,
         enderecos: enderecosPayload,
         qtdPostes: parseFloatSafe(form.totalPostes),
         qtdCaboM: parseFloatSafe(form.totalCaboM),
@@ -589,12 +612,55 @@ export default function AlvaraDetalhePainel({ numeroProjeto, onFechar, onRenomea
                         <input
                           type="text"
                           value={form.responsavel}
-                          onChange={(e) => setForm({ ...form, responsavel: e.target.value })}
+                          onChange={(e) => setForm({ ...form, responsavel: e.target.value.toUpperCase() })}
                           placeholder="Quem está tratando"
                           className={`${inputCls} w-64`}
                         />
                       ) : (
                         <span className="text-sm text-copel-grafite">{alvara.responsavel || 'Não atribuído'}</span>
+                      )}
+                    </LinhaCampo>
+                    {alvara.tipo === 'PARTICULAR' && (
+                      <LinhaCampo label="Protocolo">
+                        {editando ? (
+                          <input
+                            type="text"
+                            value={form.protocolo}
+                            onChange={(e) => setForm({ ...form, protocolo: e.target.value })}
+                            onBlur={() => setForm((prev) => ({ ...prev, protocolo: formatarProtocolo(prev.protocolo) }))}
+                            placeholder="Ex: 01.20265390528222"
+                            className={`${inputCls} w-64`}
+                          />
+                        ) : (
+                          <span className="text-sm text-copel-grafite">{alvara.protocolo || '—'}</span>
+                        )}
+                      </LinhaCampo>
+                    )}
+                    <LinhaCampo label="Número do Alvará">
+                      {editando ? (
+                        <input
+                          type="text"
+                          value={form.numeroAlvara}
+                          onChange={(e) => setForm({ ...form, numeroAlvara: e.target.value })}
+                          placeholder="Ex: 2026/0017734"
+                          className={`${inputCls} w-64`}
+                        />
+                      ) : (
+                        <span className="text-sm text-copel-grafite">{alvara.numeroAlvara || '—'}</span>
+                      )}
+                    </LinhaCampo>
+                    <LinhaCampo label="Data Recebimento">
+                      {editando ? (
+                        <input
+                          type="date"
+                          value={form.dataRecebimentoAlvara}
+                          onChange={(e) => setForm({ ...form, dataRecebimentoAlvara: e.target.value })}
+                          className={`${inputCls} w-48`}
+                        />
+                      ) : (
+                        <span className="text-sm text-copel-grafite">
+                          {alvara.dataRecebimentoAlvara ? formatarDataSomente(alvara.dataRecebimentoAlvara) : '—'}
+                        </span>
                       )}
                     </LinhaCampo>
                   </div>

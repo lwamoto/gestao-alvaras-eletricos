@@ -50,6 +50,7 @@ function AppShell() {
     return { view: inicial.view, projetoAberto: inicial.projeto, imprimirProjeto: inicial.imprimir };
   });
   const [refreshKey, setRefreshKey] = useState(0);
+  const [cadastroLote, setCadastroLote] = useState(false);
   const [sidebarRecolhida, setSidebarRecolhida] = useState(lerSidebarRecolhida);
   const [indiceFundo, setIndiceFundo] = useState(indiceFundoAtual);
 
@@ -173,8 +174,12 @@ function AppShell() {
           </div>
         )}
         {viewEfetiva === 'cadastrar' && (
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <AlvaraForm onCreate={handleCreate} />
+          <div
+            className={`mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-[max-width] duration-200 ${
+              cadastroLote ? 'max-w-7xl' : 'max-w-5xl'
+            }`}
+          >
+            <AlvaraForm onCreate={handleCreate} onModoLoteChange={setCadastroLote} />
           </div>
         )}
         {viewEfetiva === 'pesquisar' && (

@@ -108,7 +108,7 @@ router.get('/:id/historico', requireCopel, async (req, res) => {
 
 router.post('/', requireCopel, async (req, res) => {
   try {
-    const { numeroProjeto, tipo, empreiteira, situacao, responsavel } = req.body;
+    const { numeroProjeto, tipo, empreiteira, situacao, responsavel, protocolo } = req.body;
 
     if (tipo === 'PARTICULAR' && !(await validarEmpreiteira(empreiteira))) {
       return res.status(400).json({ erro: 'Empreiteira inválida ou inativa.' });
@@ -120,7 +120,8 @@ router.post('/', requireCopel, async (req, res) => {
       tipo,
       empreiteira: tipo === 'PARTICULAR' ? empreiteira : undefined,
       situacao,
-      responsavel,
+      responsavel: (responsavel || '').toUpperCase(),
+      protocolo: tipo === 'PARTICULAR' ? protocolo : undefined,
     });
 
     try {
@@ -152,6 +153,9 @@ const CAMPOS_EDITAVEIS = [
   'transversal1',
   'transversal2',
   'dataMarcada',
+  'dataRecebimentoAlvara',
+  'numeroAlvara',
+  'protocolo',
   'qtdPostes',
   'qtdCaboM',
   'enderecos',
@@ -168,6 +172,12 @@ router.patch('/:id', requireCopel, async (req, res) => {
   try {
     const antes = await Alvara.findById(req.params.id);
     if (!antes) return res.status(404).json({ erro: 'Alvará não encontrado.' });
+
+    // findByIdAndUpdate não roda o setter `uppercase` do schema — garante aqui
+    // pra não voltar a misturar "gustavo"/"GUSTAVO" no agrupamento do Dashboard.
+    if (typeof req.body.responsavel === 'string') {
+      req.body.responsavel = req.body.responsavel.toUpperCase();
+    }
 
     const alteracoes = {};
     const diff = {};

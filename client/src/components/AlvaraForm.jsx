@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { FilePlus, ChevronDown, Check, AlertCircle, Menu, Plus, Trash2 } from 'lucide-react';
 import { TIPOS } from '../constants.js';
 import { listEmpreiteiras } from '../empreiteirasApi.js';
+import { formatarProtocolo } from '../protocolo.js';
 
 const vazio = {
   numeroProjeto: '',
   tipo: '',
   empreiteira: '',
+  protocolo: '',
   responsavel: '',
 };
 
@@ -14,7 +16,7 @@ const MAX_LINHAS_LOTE = 10;
 const MIN_LINHAS_LOTE = 2;
 
 function linhaLoteVazia() {
-  return { numeroProjeto: '', tipo: '', empreiteira: '', responsavel: '' };
+  return { numeroProjeto: '', tipo: '', empreiteira: '', protocolo: '', responsavel: '' };
 }
 
 const corTag = {
@@ -26,7 +28,7 @@ const corTag = {
 const inputCls =
   'w-full px-3.5 py-2.5 border border-gray-300 dark:border-white/15 bg-white dark:bg-[#20232a] rounded text-sm text-copel-grafite placeholder:text-copel-cinza-medio focus:border-copel-laranja transition-colors';
 
-export default function AlvaraForm({ onCreate }) {
+export default function AlvaraForm({ onCreate, onModoLoteChange }) {
   const [form, setForm] = useState(vazio);
   const [erro, setErro] = useState('');
   const [sucesso, setSucesso] = useState(false);
@@ -43,22 +45,47 @@ export default function AlvaraForm({ onCreate }) {
   }, []);
 
   function escolherTipo(tipo) {
-    setForm({ ...form, tipo, empreiteira: tipo === 'PARTICULAR' ? form.empreiteira : '' });
+    setForm({
+      ...form,
+      tipo,
+      empreiteira: tipo === 'PARTICULAR' ? form.empreiteira : '',
+      protocolo: tipo === 'PARTICULAR' ? form.protocolo : '',
+    });
     if (tipo !== 'PARTICULAR') setTipoAberto(false);
+  }
+
+  function formatarProtocoloAoSair() {
+    setForm((prev) => ({ ...prev, protocolo: formatarProtocolo(prev.protocolo) }));
   }
 
   function alternarModoLote() {
     setErro('');
     setSucesso(false);
-    setModoLote((v) => !v);
+    // Nunca chamar setState de outro componente dentro do updater do
+    // setModoLote — React trata isso como "update durante o render" e
+    // solta o warning (mesmo disparado por um clique, não durante render).
+    const novo = !modoLote;
+    setModoLote(novo);
+    onModoLoteChange?.(novo);
   }
 
   function atualizarLinhaLote(idx, campo, valor) {
     setLinhasLote((prev) => {
       const linhas = [...prev];
       const atual = { ...linhas[idx], [campo]: valor };
-      if (campo === 'tipo' && valor !== 'PARTICULAR') atual.empreiteira = '';
+      if (campo === 'tipo' && valor !== 'PARTICULAR') {
+        atual.empreiteira = '';
+        atual.protocolo = '';
+      }
       linhas[idx] = atual;
+      return linhas;
+    });
+  }
+
+  function formatarProtocoloLinhaAoSair(idx) {
+    setLinhasLote((prev) => {
+      const linhas = [...prev];
+      linhas[idx] = { ...linhas[idx], protocolo: formatarProtocolo(linhas[idx].protocolo) };
       return linhas;
     });
   }
@@ -140,15 +167,16 @@ export default function AlvaraForm({ onCreate }) {
         <form onSubmit={handleSubmit} className="p-6 sm:p-8">
           {modoLote ? (
           <div className="space-y-3">
-            <div className="hidden sm:grid grid-cols-[1fr_1fr_1fr_1fr_28px] gap-2 px-1">
+            <div className="hidden sm:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_28px] gap-2 px-1">
               <span className="text-xs font-medium text-copel-cinza-medio">Nº do projeto</span>
               <span className="text-xs font-medium text-copel-cinza-medio">Modelo</span>
               <span className="text-xs font-medium text-copel-cinza-medio">Empreiteira</span>
+              <span className="text-xs font-medium text-copel-cinza-medio">Protocolo</span>
               <span className="text-xs font-medium text-copel-cinza-medio">Responsável</span>
               <span />
             </div>
             {linhasLote.map((linha, idx) => (
-              <div key={idx} className="grid grid-cols-2 sm:grid-cols-[1fr_1fr_1fr_1fr_28px] gap-2 items-center">
+              <div key={idx} className="grid grid-cols-2 sm:grid-cols-[1fr_1fr_1fr_1fr_1fr_28px] gap-2 items-center">
                 <input
                   type="text"
                   placeholder="Ex: 12345"
@@ -183,12 +211,24 @@ export default function AlvaraForm({ onCreate }) {
                 ) : (
                   <div className={`${inputCls} py-2 text-copel-cinza-medio bg-copel-cinza dark:bg-white/5`}>—</div>
                 )}
+                {linha.tipo === 'PARTICULAR' ? (
+                  <input
+                    type="text"
+                    placeholder="Opcional"
+                    value={linha.protocolo}
+                    onChange={(e) => atualizarLinhaLote(idx, 'protocolo', e.target.value)}
+                    onBlur={() => formatarProtocoloLinhaAoSair(idx)}
+                    className={`${inputCls} py-2`}
+                  />
+                ) : (
+                  <div className={`${inputCls} py-2 text-copel-cinza-medio bg-copel-cinza dark:bg-white/5`}>—</div>
+                )}
                 <input
                   type="text"
                   maxLength={20}
                   placeholder="Opcional"
                   value={linha.responsavel}
-                  onChange={(e) => atualizarLinhaLote(idx, 'responsavel', e.target.value)}
+                  onChange={(e) => atualizarLinhaLote(idx, 'responsavel', e.target.value.toUpperCase())}
                   className={`${inputCls} py-2`}
                 />
                 <button
@@ -296,6 +336,22 @@ export default function AlvaraForm({ onCreate }) {
               </div>
             )}
 
+            {form.tipo === 'PARTICULAR' && (
+              <div>
+                <label className="block mb-1.5 text-xs font-medium text-copel-cinza-medio">
+                  Protocolo <span className="text-copel-cinza-medio font-normal">(opcional)</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ex: 20265390528222"
+                  value={form.protocolo}
+                  onChange={(e) => setForm({ ...form, protocolo: e.target.value })}
+                  onBlur={formatarProtocoloAoSair}
+                  className={inputCls}
+                />
+              </div>
+            )}
+
             <div className="sm:col-span-2">
               <label className="block mb-1.5 text-xs font-medium text-copel-cinza-medio">
                 Responsável <span className="text-copel-cinza-medio font-normal">(opcional)</span>
@@ -304,7 +360,7 @@ export default function AlvaraForm({ onCreate }) {
                 type="text"
                 placeholder="Quem vai tratar esse alvará"
                 value={form.responsavel}
-                onChange={(e) => setForm({ ...form, responsavel: e.target.value })}
+                onChange={(e) => setForm({ ...form, responsavel: e.target.value.toUpperCase() })}
                 className={inputCls}
               />
             </div>
