@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { margin: 0; padding: 32px; background: #ffffff; font-family: 'Consolas', 'Courier New', monospace; }
+  .box { border: 1px solid #d0d0d0; border-radius: 8px; padding: 24px 32px; display: inline-block; background: #f8f9fb; }
+  pre { margin: 0; font-size: 14px; line-height: 1.6; color: #1f2430; }
+  .dir { color: #b45309; font-weight: 700; }
+  .file { color: #1d4ed8; }
+  .comment { color: #6b7280; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="box"><pre><span class="dir">client/</span>
+├── <span class="file">package.json</span>
+├── <span class="file">index.html</span>
+└── <span class="dir">src/</span>
+    ├── <span class="file">main.jsx</span>
+    ├── <span class="file">App.jsx</span>              <span class="comment"># shell / roteamento por query string</span>
+    ├── <span class="file">api.js</span>               <span class="comment"># chamadas HTTP de Alvará</span>
+    ├── <span class="file">authApi.js / usuariosApi.js / empreiteirasApi.js / notificacoesApi.js</span>
+    ├── <span class="file">constants.js / cores.js / planilha.js / protocolo.js</span>
+    ├── <span class="dir">contexts/</span>
+    │   ├── <span class="file">AuthContext.jsx</span>   <span class="comment"># sessão / usuário logado</span>
+    │   └── <span class="file">ThemeContext.jsx</span>  <span class="comment"># tema claro/escuro</span>
+    └── <span class="dir">components/</span>
+        ├── <span class="file">Login.jsx</span>
+        ├── <span class="file">Sidebar.jsx / BrandMark.jsx</span>
+        ├── <span class="file">AlvaraForm.jsx</span>          <span class="comment"># cadastro único + em lote</span>
+        ├── <span class="file">PesquisarAlvara.jsx</span>
+        ├── <span class="file">AlvaraDetalhePainel.jsx</span> <span class="comment"># Projeto / Status / Endereço</span>
+        ├── <span class="file">SolicitacaoImpressao.jsx</span>
+        ├── <span class="file">Dashboard.jsx</span>
+        ├── <span class="file">UsuariosAdmin.jsx</span>
+        ├── <span class="file">EmpreiteirasAdmin.jsx</span>
+        └── <span class="file">NotificacoesSino.jsx</span>
+</pre></div>
+</body>
+</html>

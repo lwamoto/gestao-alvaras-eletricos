@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { margin: 0; padding: 32px; background: #ffffff; font-family: 'Consolas', 'Courier New', monospace; }
+  .box { border: 1px solid #d0d0d0; border-radius: 8px; padding: 24px 32px; display: inline-block; background: #f8f9fb; }
+  pre { margin: 0; font-size: 15px; line-height: 1.65; color: #1f2430; }
+  .dir { color: #b45309; font-weight: 700; }
+  .file { color: #1d4ed8; }
+  .comment { color: #6b7280; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="box"><pre><span class="dir">server/</span>
+├── <span class="file">package.json</span>
+├── <span class="file">.env.example</span>
+├── <span class="dir">scripts/</span>
+│   ├── <span class="file">criarUsuario.js</span>          <span class="comment"># cria usuário via linha de comando</span>
+│   └── <span class="file">importarAlvaras2026.js</span>   <span class="comment"># importação em lote de alvarás</span>
+└── <span class="dir">src/</span>
+    ├── <span class="file">index.js</span>              <span class="comment"># bootstrap do Express + Mongoose</span>
+    ├── <span class="dir">middleware/</span>
+    │   └── <span class="file">auth.js</span>            <span class="comment"># requireAuth / requireCopel</span>
+    ├── <span class="dir">models/</span>
+    │   ├── <span class="file">Alvara.js</span>
+    │   ├── <span class="file">Usuario.js</span>
+    │   ├── <span class="file">Empreiteira.js</span>
+    │   ├── <span class="file">Notificacao.js</span>
+    │   └── <span class="file">HistoricoAlvara.js</span>
+    └── <span class="dir">routes/</span>
+        ├── <span class="file">auth.js</span>
+        ├── <span class="file">alvaras.js</span>
+        ├── <span class="file">usuarios.js</span>
+        ├── <span class="file">empreiteiras.js</span>
+        └── <span class="file">notificacoes.js</span>
+</pre></div>
+</body>
+</html>

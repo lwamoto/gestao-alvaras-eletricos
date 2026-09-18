@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { margin: 0; padding: 20px; background: #ffffff; font-family: 'Segoe UI', Arial, sans-serif; }
+  text { font-family: 'Segoe UI', Arial, sans-serif; }
+</style>
+</head>
+<body>
+<svg width="1400" height="820" viewBox="0 0 1400 820">
+  <!-- Limite do sistema -->
+  <rect x="220" y="30" width="1000" height="750" rx="10" fill="#fafafa" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="6,4" />
+  <text x="720" y="58" text-anchor="middle" font-size="16" font-weight="700" fill="#374151">Sistema de Controle de Alvará</text>
+
+  <!-- Ator COPEL -->
+  <g stroke="#1f2937" stroke-width="2" fill="none">
+    <circle cx="90" cy="230" r="16" />
+    <line x1="90" y1="246" x2="90" y2="300" />
+    <line x1="60" y1="265" x2="120" y2="265" />
+    <line x1="90" y1="300" x2="65" y2="345" />
+    <line x1="90" y1="300" x2="115" y2="345" />
+  </g>
+  <text x="90" y="370" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">Usuário COPEL</text>
+
+  <!-- Ator EMPREITEIRA -->
+  <g stroke="#1f2937" stroke-width="2" fill="none">
+    <circle cx="1310" cy="230" r="16" />
+    <line x1="1310" y1="246" x2="1310" y2="300" />
+    <line x1="1280" y1="265" x2="1340" y2="265" />
+    <line x1="1310" y1="300" x2="1285" y2="345" />
+    <line x1="1310" y1="300" x2="1335" y2="345" />
+  </g>
+  <text x="1310" y="370" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">Usuário EMPREITEIRA</text>
+
+  <!-- Linhas ator -> caso de uso -->
+  <g stroke="#9ca3af" stroke-width="1.3">
+    <!-- COPEL -->
+    <line x1="118" y1="255" x2="300" y2="95" />
+    <line x1="120" y1="258" x2="300" y2="165" />
+    <line x1="121" y1="262" x2="300" y2="235" />
+    <line x1="122" y1="267" x2="300" y2="305" />
+    <line x1="122" y1="273" x2="300" y2="375" />
+    <line x1="121" y1="280" x2="300" y2="445" />
+    <line x1="120" y1="288" x2="300" y2="515" />
+    <line x1="118" y1="300" x2="630" y2="150" />
+    <line x1="115" y1="315" x2="630" y2="320" />
+    <line x1="112" y1="328" x2="630" y2="480" />
+    <line x1="110" y1="340" x2="630" y2="640" />
+
+    <!-- EMPREITEIRA -->
+    <line x1="1282" y1="255" x2="890" y2="150" />
+    <line x1="1280" y1="270" x2="890" y2="320" />
+    <line x1="1280" y1="285" x2="890" y2="480" />
+    <line x1="1282" y1="298" x2="890" y2="640" />
+    <line x1="1288" y1="320" x2="1160" y2="320" />
+  </g>
+
+  <!-- Casos de uso — COPEL -->
+  <g font-size="13" fill="#1f2937">
+    <ellipse cx="450" cy="95" rx="150" ry="30" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" />
+    <text x="450" y="100" text-anchor="middle">Cadastrar Alvará (único/lote)</text>
+
+    <ellipse cx="450" cy="165" rx="150" ry="30" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" />
+    <text x="450" y="170" text-anchor="middle">Editar Alvará</text>
+
+    <ellipse cx="450" cy="235" rx="150" ry="30" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" />
+    <text x="450" y="240" text-anchor="middle">Excluir Alvará</text>
+
+    <ellipse cx="450" cy="305" rx="150" ry="30" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" />
+    <text x="450" y="310" text-anchor="middle">Gerenciar Usuários</text>
+
+    <ellipse cx="450" cy="375" rx="150" ry="30" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" />
+    <text x="450" y="380" text-anchor="middle">Gerenciar Empreiteiras</text>
+
+    <ellipse cx="450" cy="445" rx="150" ry="30" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" />
+    <text x="450" y="450" text-anchor="middle">Imprimir Solicitação/Planilha</text>
+
+    <ellipse cx="450" cy="515" rx="150" ry="30" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" />
+    <text x="450" y="520" text-anchor="middle">Notificar Empreiteira</text>
+  </g>
+
+  <!-- Casos de uso — compartilhados -->
+  <g font-size="13" fill="#1f2937">
+    <ellipse cx="760" cy="150" rx="130" ry="30" fill="#fef3c7" stroke="#b45309" stroke-width="1.5" />
+    <text x="760" y="155" text-anchor="middle">Login</text>
+
+    <ellipse cx="760" cy="320" rx="130" ry="30" fill="#fef3c7" stroke="#b45309" stroke-width="1.5" />
+    <text x="760" y="325" text-anchor="middle">Pesquisar/Filtrar Alvará</text>
+
+    <ellipse cx="760" cy="480" rx="130" ry="30" fill="#fef3c7" stroke="#b45309" stroke-width="1.5" />
+    <text x="760" y="485" text-anchor="middle">Visualizar Dashboard</text>
+
+    <ellipse cx="760" cy="640" rx="130" ry="30" fill="#fef3c7" stroke="#b45309" stroke-width="1.5" />
+    <text x="760" y="645" text-anchor="middle">Alternar Tema Claro/Escuro</text>
+  </g>
+
+  <!-- Caso de uso — EMPREITEIRA -->
+  <g font-size="13" fill="#1f2937">
+    <ellipse cx="1040" cy="320" rx="120" ry="30" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5" />
+    <text x="1040" y="325" text-anchor="middle">Receber Notificação</text>
+  </g>
+
+  <!-- Legenda -->
+  <g font-size="12">
+    <rect x="260" y="720" width="18" height="14" fill="#dbeafe" stroke="#2563eb" />
+    <text x="285" y="731">Exclusivo COPEL</text>
+    <rect x="440" y="720" width="18" height="14" fill="#fef3c7" stroke="#b45309" />
+    <text x="465" y="731">Compartilhado</text>
+    <rect x="610" y="720" width="18" height="14" fill="#dcfce7" stroke="#16a34a" />
+    <text x="635" y="731">Exclusivo EMPREITEIRA</text>
+  </g>
+</svg>
+</body>
+</html>

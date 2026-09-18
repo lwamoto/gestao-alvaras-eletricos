@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 20px; background: #ffffff; font-family: 'Segoe UI', Arial, sans-serif; }
+  .canvas { position: relative; width: 1240px; height: 840px; }
+  svg.lines { position: absolute; top: 0; left: 0; width: 1240px; height: 840px; z-index: 0; }
+  .entity { position: absolute; border: 2px solid #b45309; border-radius: 6px; background: #fff7ed; box-shadow: 0 2px 6px rgba(0,0,0,0.08); z-index: 1; }
+  .entity h4 { margin: 0; padding: 8px 12px; background: #b45309; color: #fff; font-size: 15px; border-radius: 4px 4px 0 0; }
+  .entity ul { margin: 0; padding: 8px 16px 10px 28px; font-size: 12.5px; line-height: 1.55; color: #222; }
+  .entity li.pk { font-weight: 700; }
+  .label { position: absolute; background: #fff; padding: 1px 5px; font-size: 11px; color: #6b7280; z-index: 2; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <svg class="lines">
+    <defs>
+      <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L6,3 L0,6 Z" fill="#6b7280" />
+      </marker>
+    </defs>
+    <!-- Alvara -> Empreiteira -->
+    <path d="M 780,400 C 900,320 980,220 1095,162" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#arrow)" />
+    <!-- Alvara -> Usuario (incluidoPor/editadoPor sao texto livre, nao FK — linha pontilhada) -->
+    <path d="M 480,420 C 340,340 260,300 145,250" fill="none" stroke="#9ca3af" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#arrow)" />
+    <!-- Notificacao -> Alvara -->
+    <path d="M 160,658 C 300,580 380,540 478,558" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#arrow)" />
+    <!-- Notificacao -> Empreiteira -->
+    <path d="M 300,730 C 650,840 950,820 1095,168" fill="none" stroke="#9ca3af" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#arrow)" />
+    <!-- HistoricoAlvara -> Alvara -->
+    <path d="M 1050,658 C 900,600 850,580 782,558" fill="none" stroke="#6b7280" stroke-width="1.6" marker-end="url(#arrow)" />
+    <!-- HistoricoAlvara -> Usuario -->
+    <path d="M 900,760 C 500,900 160,700 148,255" fill="none" stroke="#9ca3af" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#arrow)" />
+  </svg>
+
+  <div class="entity" style="left:20px; top:40px; width:240px;">
+    <h4>Usuario</h4>
+    <ul>
+      <li class="pk">_id</li>
+      <li>nome</li>
+      <li>email (único)</li>
+      <li>chaveAcesso (único)</li>
+      <li>senhaHash</li>
+      <li>tipo: COPEL | EMPREITEIRA</li>
+      <li>empreiteira</li>
+    </ul>
+  </div>
+
+  <div class="entity" style="left:980px; top:40px; width:240px;">
+    <h4>Empreiteira</h4>
+    <ul>
+      <li class="pk">_id</li>
+      <li>nome (único)</li>
+      <li>ativo</li>
+    </ul>
+  </div>
+
+  <div class="entity" style="left:480px; top:340px; width:300px;">
+    <h4>Alvara</h4>
+    <ul>
+      <li class="pk">_id</li>
+      <li>numeroProjeto (único)</li>
+      <li>tipo: CONSUMIDOR | PARTICULAR | POO</li>
+      <li>empreiteira</li>
+      <li>situacao: A_FAZER | ENVIADO | RECEBIDO | NAO_NECESSARIO</li>
+      <li>responsavel (uppercase)</li>
+      <li>protocolo</li>
+      <li>numeroAlvara</li>
+      <li>dataMarcada / dataRecebimentoAlvara</li>
+      <li>enderecos: [ ] <i>(embutido)</i></li>
+      <li>qtdPostes / qtdCaboM</li>
+      <li>incluidoPor / editadoPor / editadoEm</li>
+    </ul>
+  </div>
+
+  <div class="entity" style="left:20px; top:660px; width:280px;">
+    <h4>Notificacao</h4>
+    <ul>
+      <li class="pk">_id</li>
+      <li>empreiteira</li>
+      <li>alvaraId → Alvara</li>
+      <li>numeroProjeto</li>
+      <li>mensagem</li>
+      <li>lida</li>
+      <li>criadoPor</li>
+    </ul>
+  </div>
+
+  <div class="entity" style="left:900px; top:660px; width:300px;">
+    <h4>HistoricoAlvara</h4>
+    <ul>
+      <li class="pk">_id</li>
+      <li>alvaraId → Alvara</li>
+      <li>numeroProjeto</li>
+      <li>acao: criado | editado | excluido</li>
+      <li>usuarioId → Usuario</li>
+      <li>usuarioNome</li>
+      <li>alteracoes (Mixed)</li>
+    </ul>
+  </div>
+
+  <div class="label" style="left:880px; top:250px;">1 empreiteira → N alvarás</div>
+  <div class="label" style="left:280px; top:250px;">incluidoPor / editadoPor (texto)</div>
+  <div class="label" style="left:340px; top:530px;">1 alvará → N notificações</div>
+  <div class="label" style="left:760px; top:530px;">1 alvará → N eventos</div>
+</div>
+</body>
+</html>
